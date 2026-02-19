@@ -9,7 +9,7 @@ namespace LibraryManager
         private List<Book> _books;
         public Library()
         {
-            _books = new List<Book>();
+            _books = FileManager.LoadFromFile();
         }
 
         public void AddBook(Book book)
