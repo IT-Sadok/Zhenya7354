@@ -23,7 +23,7 @@ namespace LibraryManager
             Console.WriteLine("Provide book isbn number: ");
             return int.TryParse(Console.ReadLine(), out int result) ? result : 0;
         }
-        public static Book GetBookInfoFromUser()
+        public static LibraryBook GetBookInfoFromUser()
         {
             Console.WriteLine("Provide book isbn number: ");
             int isbn = int.TryParse(Console.ReadLine(), out int result) ? result : 0;
@@ -33,13 +33,17 @@ namespace LibraryManager
             string author = Console.ReadLine() ?? string.Empty;
             Console.WriteLine("Provide book publication year: ");
             int publicationYear = int.TryParse(Console.ReadLine(), out int yearResult) ? yearResult : 0;
-            return new Book(isbn, title, author, publicationYear);
+            return new LibraryBook(isbn, title, author, publicationYear);
         }
 
         public static string GetSearchQueryFromUser()
         {
             Console.WriteLine("Provide book title or author: ");
             return Console.ReadLine() ?? string.Empty;
+        }
+        public static void DisplayBookInfo(Book book)
+        {
+            Console.WriteLine($"ISBN: {book.Isbn}, Title: {book.Title}, Author: {book.Author}, Publication Year: {book.PublicationYear}, Status: {book.Status} \n");
         }
     }
 }

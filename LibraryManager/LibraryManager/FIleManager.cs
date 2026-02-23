@@ -15,16 +15,14 @@ namespace LibraryManager
             }
         }
         private readonly static string _path = "library.json";
-        public static void SaveToFile(List<Book> books)
+        public static void SaveToFile(IEnumerable<Book> books)
         {
-            string json = JsonSerializer.Serialize<List<Book>>(books);
+            string json = JsonSerializer.Serialize(books);
             File.WriteAllText(_path, json);
         }
 
-        public static List<Book> LoadFromFile()
+        public static List<Book> LoadLibraryBooksFromFile()
         {
-            
-            
                 string json = File.ReadAllText(_path);
             if (string.IsNullOrEmpty(json)) return new List<Book>();
             return JsonSerializer.Deserialize<List<Book>>(json) ?? new List<Book>();

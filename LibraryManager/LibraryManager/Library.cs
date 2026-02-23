@@ -10,7 +10,7 @@ namespace LibraryManager
         private List<Book> _books;
         public Library()
         {
-            _books = FileManager.LoadFromFile();
+            _books = FileManager.LoadLibraryBooksFromFile();
         }
 
         public void AddBook(Book book)
@@ -38,12 +38,11 @@ namespace LibraryManager
         {
             return _books.Where(b => b.Status == Status.Available).ToList();
         }
-        public void BorrowBook(int isbn)
+        public void BorrowBook(int isbn) 
         {
             var bookToBorrow = _books.FirstOrDefault(b => b.Isbn == isbn) ??
                 throw new Exception($" Book with isbn: {isbn} was not found\n");
             bookToBorrow.Status = Status.Borrowed;
-            Console.WriteLine("Book has been borrowed successfuly");
             FileManager.SaveToFile(_books);
         }
 
@@ -52,7 +51,6 @@ namespace LibraryManager
                 var bookToReturn = _books.FirstOrDefault(b => b.Isbn == isbn) ??
                     throw new Exception($" Book with isbn: {isbn} was not found\n");
                 bookToReturn.Status = Status.Available;
-                Console.WriteLine("Book has been returned successfuly");
                 FileManager.SaveToFile(_books);
         }
     }

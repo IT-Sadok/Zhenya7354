@@ -30,7 +30,7 @@ class Program
                         }
                         foreach (var b in availableBooks)
                         {
-                            b.DisplayInfo();
+                            LibraryManagerApp.DisplayBookInfo(b);
                         }
                         break;
                     case 2:
@@ -42,7 +42,7 @@ class Program
                         library.ReturnBook(isbn);
                         break;
                     case 4:
-                        Book book = LibraryManagerApp.GetBookInfoFromUser();
+                        LibraryBook book = LibraryManagerApp.GetBookInfoFromUser();
                         library.AddBook(book);
                         break;
                     case 5:
@@ -52,7 +52,7 @@ class Program
                     case 6:
                         string query = LibraryManagerApp.GetSearchQueryFromUser();
                         var foundBook = library.GetBookByAuthorOrTitle(query);
-                        foundBook.DisplayInfo();
+                        LibraryManagerApp.DisplayBookInfo(foundBook);
                         break;
                     case 0:
                         Console.WriteLine("Exiting the application. Goodbye!");
