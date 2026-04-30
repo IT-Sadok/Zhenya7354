@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PcBuilder.Data;
@@ -13,25 +14,27 @@ using PcBuilder.Enums;
 namespace PcBuilder.Migrations
 {
     [DbContext(typeof(PcDbContext))]
-    partial class PcDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260430094030_MapProjectEnumsToDatabaseEnums")]
+    partial class MapProjectEnumsToDatabaseEnums
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "10.0.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "cooler_type", new[] { "AIO Liquid", "Air", "Custom Liquid" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "form_factor", new[] { "ATX", "E-ATX", "Micro-ATX", "Mini-ITX", "SSI-CEB", "XL-ATX" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "gpu_interface", new[] { "PCIe 3.0 x16", "PCIe 4.0 x16", "PCIe 5.0 x16" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "memory_type", new[] { "DDR4", "DDR4/DDR5", "DDR5" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "panel_type", new[] { "IPS", "Mini-LED", "OLED", "QD-OLED", "TN", "VA" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "psu_modular", new[] { "Fully Modular", "Non-Modular", "Semi-Modular" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "psu_rating", new[] { "80+ Bronze", "80+ Gold", "80+ Platinum", "80+ Silver", "80+ Titanium", "80+ White" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "socket_type", new[] { "AM4", "AM5", "LGA1200", "LGA1700", "LGA1851", "LGA2066", "SP3", "sTR4", "sTRX4" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "storage_form_factor", new[] { "2.5", "3.5", "Add-In Card", "M.2 22110", "M.2 2242", "M.2 2260", "M.2 2280", "U.2" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "storage_interface", new[] { "NVMe PCIe 3.0", "NVMe PCIe 4.0", "NVMe PCIe 5.0", "SAS", "SATA III" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "cooler_type", new[] { "air", "custom_liquid", "liquid" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "form_factor", new[] { "atx", "eatx", "micro_atx", "mini_itx", "ssiceb", "xlatx" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "gpu_interface", new[] { "p_cle3x16", "p_cle4x16", "p_cle5x16" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "memory_type", new[] { "ddr4", "ddr5", "mixed" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "panel_type", new[] { "ips", "mini_led", "oled", "qdoled", "tn", "va" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "psu_modular", new[] { "fully_modular", "non_modular", "semi_modular" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "psu_rating", new[] { "bronze", "gold", "platinum", "silver", "titanium" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "socket_type", new[] { "am4", "am5", "lga1200", "lga1700", "lga1851", "lga2066", "s_trx4", "sp3", "tr4" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "storage_form_factor", new[] { "add_in_card", "m2_22110", "m2_2242", "m2_2260", "m2_2280", "sata_2_5", "sata_3_5", "u2" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "storage_interface", new[] { "nvme_pcie_gen3", "nvme_pcie_gen4", "nvme_pcie_gen5", "sas", "sata_3" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

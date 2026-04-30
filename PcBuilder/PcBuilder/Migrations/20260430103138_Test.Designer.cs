@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PcBuilder.Data;
@@ -13,9 +14,11 @@ using PcBuilder.Enums;
 namespace PcBuilder.Migrations
 {
     [DbContext(typeof(PcDbContext))]
-    partial class PcDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260430103138_Test")]
+    partial class Test
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,7 +32,7 @@ namespace PcBuilder.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "panel_type", new[] { "IPS", "Mini-LED", "OLED", "QD-OLED", "TN", "VA" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "psu_modular", new[] { "Fully Modular", "Non-Modular", "Semi-Modular" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "psu_rating", new[] { "80+ Bronze", "80+ Gold", "80+ Platinum", "80+ Silver", "80+ Titanium", "80+ White" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "socket_type", new[] { "AM4", "AM5", "LGA1200", "LGA1700", "LGA1851", "LGA2066", "SP3", "sTR4", "sTRX4" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "socket_type", new[] { "AM4", "AM5", "LGA1151", "LGA1200", "LGA1700", "LGA2066", "SP3", "sTR4", "sTRX4" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "storage_form_factor", new[] { "2.5", "3.5", "Add-In Card", "M.2 22110", "M.2 2242", "M.2 2260", "M.2 2280", "U.2" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "storage_interface", new[] { "NVMe PCIe 3.0", "NVMe PCIe 4.0", "NVMe PCIe 5.0", "SAS", "SATA III" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
