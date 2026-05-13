@@ -5,18 +5,15 @@ using System.Text;
 
 namespace LibraryManager
 {
-    class Library
+    class Library(IFileManager fileManager)
     {
-        private List<Book> _books;
-        public Library()
-        {
-            _books = FileManager.LoadLibraryBooksFromFile();
-        }
+        private readonly List<Book> _books = fileManager.LoadFromFile();
+        
 
         public void AddBook(Book book)
         {
             _books.Add(book);
-            FileManager.SaveToFile(_books);
+            fileManager.SaveToFile(_books);
         }
         public void RemoveBook(int isbn)
         {
@@ -24,7 +21,7 @@ namespace LibraryManager
                 throw new Exception($" Book with isbn: {isbn} was not found\n");
 
             _books.Remove(bookToDelete);
-            FileManager.SaveToFile(_books);
+            fileManager.SaveToFile(_books);
         }
 
         public Book GetBookByAuthorOrTitle(string query)
@@ -43,7 +40,7 @@ namespace LibraryManager
             var bookToBorrow = _books.FirstOrDefault(b => b.Isbn == isbn) ??
                 throw new Exception($" Book with isbn: {isbn} was not found\n");
             bookToBorrow.Status = Status.Borrowed;
-            FileManager.SaveToFile(_books);
+            fileManager.SaveToFile(_books);
         }
 
         public void ReturnBook(int isbn)
@@ -51,7 +48,7 @@ namespace LibraryManager
                 var bookToReturn = _books.FirstOrDefault(b => b.Isbn == isbn) ??
                     throw new Exception($" Book with isbn: {isbn} was not found\n");
                 bookToReturn.Status = Status.Available;
-                FileManager.SaveToFile(_books);
+                fileManager.SaveToFile(_books);
         }
     }
 }

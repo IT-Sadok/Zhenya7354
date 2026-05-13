@@ -6,8 +6,6 @@ namespace LibraryManager
 {
     class LibraryBook : Book
     {
-
-        
         public LibraryBook(int isbn, string title, string author, int publicationYear)
         {
             Isbn = isbn;
@@ -15,7 +13,6 @@ namespace LibraryManager
             Author = author;
             PublicationYear = publicationYear;
         }
-        
     }
 
     enum Status
