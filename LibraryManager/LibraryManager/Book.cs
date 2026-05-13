@@ -5,7 +5,6 @@ using System.Text.Json.Serialization;
 
 namespace LibraryManager
 {
-    [JsonPolymorphic(TypeDiscriminatorPropertyName = "BookType")]
     [JsonDerivedType(typeof(LibraryBook), "LibraryBook")]
     internal abstract class Book
     {
