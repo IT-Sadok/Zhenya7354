@@ -9,7 +9,8 @@ class Program
     static void Main(string[] args)
     {
         int choice = 0, isbn = 0;
-        Library library = new Library();
+        var fileManager = new FileManager();
+        Library library = new Library(fileManager);
 
         do
         {

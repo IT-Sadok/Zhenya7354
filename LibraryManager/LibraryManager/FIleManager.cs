@@ -5,7 +5,7 @@ using System.Text.Json;
 
 namespace LibraryManager
 {
-    static class FileManager
+    class FileManager : IFileManager
     {
         static FileManager()
         {
@@ -15,13 +15,13 @@ namespace LibraryManager
             }
         }
         private readonly static string _path = "library.json";
-        public static void SaveToFile(IEnumerable<Book> books)
+        public void SaveToFile(IEnumerable<Book> books)
         {
             string json = JsonSerializer.Serialize(books);
             File.WriteAllText(_path, json);
         }
 
-        public static List<Book> LoadLibraryBooksFromFile()
+        public List<Book> LoadFromFile() 
         {
                 string json = File.ReadAllText(_path);
             if (string.IsNullOrEmpty(json)) return new List<Book>();
