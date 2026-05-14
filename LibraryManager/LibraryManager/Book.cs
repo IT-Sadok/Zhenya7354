@@ -5,7 +5,8 @@ using System.Text.Json.Serialization;
 
 namespace LibraryManager;
 
-    [JsonDerivedType(typeof(LibraryBook), "LibraryBook")]
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "BookType")]
+[JsonDerivedType(typeof(LibraryBook), "LibraryBook")]
     internal abstract class Book
     {
         public int Isbn { get; set; }
@@ -13,6 +14,5 @@ namespace LibraryManager;
          public string Author { get; set; }
          public int PublicationYear { get; set; }
          public Status Status { get; set; } = Status.Available;
-
     }
 
