@@ -5,7 +5,7 @@ using System.Text;
 
 namespace LibraryManager;
 
-    class Library(IFileManager fileManager)
+    class Library(IFileManager fileManager) : ILibrary
     {
         private readonly List<Book> _books = fileManager.LoadFromFile();
         
