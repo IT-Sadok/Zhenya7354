@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace LibraryManager
-{
+namespace LibraryManager;
+
     static class LibraryManagerApp
     {
         public static void DisplayMenu()
@@ -46,4 +46,4 @@ namespace LibraryManager
             Console.WriteLine($"ISBN: {book.Isbn}, Title: {book.Title}, Author: {book.Author}, Publication Year: {book.PublicationYear}, Status: {book.Status} \n");
         }
     }
-}
+

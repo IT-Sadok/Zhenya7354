@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Text;
 
-namespace LibraryManager
-{
+namespace LibraryManager;
+
     class Library(IFileManager fileManager)
     {
         private readonly List<Book> _books = fileManager.LoadFromFile();
@@ -51,4 +51,4 @@ namespace LibraryManager
                 fileManager.SaveToFile(_books);
         }
     }
-}
+

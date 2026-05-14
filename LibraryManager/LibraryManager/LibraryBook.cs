@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace LibraryManager
-{
+namespace LibraryManager;
+
     class LibraryBook : Book
     {
         public LibraryBook(int isbn, string title, string author, int publicationYear)
@@ -20,4 +20,4 @@ namespace LibraryManager
         Available,
         Borrowed
     }
-}
+

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
 
-namespace LibraryManager
-{
+namespace LibraryManager;
+
     class FileManager : IFileManager
     {
         static FileManager()
@@ -30,4 +30,4 @@ namespace LibraryManager
             
         }
     }
-}
+

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace LibraryManager
-{
+namespace LibraryManager;
+
     [JsonDerivedType(typeof(LibraryBook), "LibraryBook")]
     internal abstract class Book
     {
@@ -15,4 +15,4 @@ namespace LibraryManager
          public Status Status { get; set; } = Status.Available;
 
     }
-}
+
