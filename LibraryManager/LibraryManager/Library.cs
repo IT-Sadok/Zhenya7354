@@ -24,10 +24,9 @@ namespace LibraryManager;
             fileManager.SaveToFile(_books);
         }
 
-        public Book GetBookByAuthorOrTitle(string query)
+        public Book? GetBookByAuthorOrTitle(string query)
         {
-            return _books.FirstOrDefault(b => b.Author == query || b.Title == query) ??
-                throw new Exception($" Book with parameter: {query} was not found\n");
+            return _books.FirstOrDefault(b => b.Author == query || b.Title == query);
         }
 
        

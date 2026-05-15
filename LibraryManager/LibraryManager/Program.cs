@@ -52,6 +52,11 @@ class Program
                     case 6:
                         string query = LibraryManagerApp.GetSearchQueryFromUser();
                         var foundBook = library.GetBookByAuthorOrTitle(query);
+                        if(foundBook is null)
+                        {
+                            Console.WriteLine("No book found matching the query.");
+                            break;
+                        }
                         LibraryManagerApp.DisplayBookInfo(foundBook);
                         break;
                     case 0:
