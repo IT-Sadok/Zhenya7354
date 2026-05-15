@@ -6,14 +6,7 @@ using System.Text.Json;
 namespace LibraryManager;
 
     class FileManager : IFileManager
-    {
-        static FileManager()
-        {
-            if (!File.Exists(_path))
-            {
-                File.Create(_path).Close();
-            }
-        }
+    { 
         private readonly static string _path = "library.json";
         public void SaveToFile(IEnumerable<Book> books)
         {
