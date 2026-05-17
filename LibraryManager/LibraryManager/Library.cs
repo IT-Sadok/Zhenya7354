@@ -7,10 +7,10 @@ namespace LibraryManager;
 
     class Library(IFileManager fileManager) : ILibrary
     {
-        private readonly List<Book> _books = fileManager.LoadFromFile();
+        private readonly List<LibraryBook> _books = fileManager.LoadFromFile();
         
 
-        public void AddBook(Book book)
+        public void AddBook(LibraryBook book)
         {
             _books.Add(book);
             fileManager.SaveToFile(_books);
@@ -24,13 +24,13 @@ namespace LibraryManager;
             fileManager.SaveToFile(_books);
         }
 
-        public Book? GetBookByAuthorOrTitle(string query)
+        public LibraryBook? GetBookByAuthorOrTitle(string query)
         {
             return _books.FirstOrDefault(b => b.Author == query || b.Title == query);
         }
 
        
-        public List<Book> GetAllAvailableBooks()
+        public List<LibraryBook> GetAllAvailableBooks()
         {
             return _books.Where(b => b.Status == Status.Available).ToList();
         }

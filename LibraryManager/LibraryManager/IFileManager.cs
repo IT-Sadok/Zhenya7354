@@ -6,7 +6,7 @@ namespace LibraryManager;
 
     interface IFileManager
     {
-       public void SaveToFile(IEnumerable<Book> books);
-        public List<Book> LoadFromFile();
+       public void SaveToFile(IEnumerable<LibraryBook> books);
+        public List<LibraryBook> LoadFromFile();
     }
 
