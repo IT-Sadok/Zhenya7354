@@ -10,6 +10,7 @@ class Program
         int choice = 0, isbn = 0;
         var fileManager = new FileManager();
         Library library = new Library(fileManager);
+        LibrarySimulation librarySimulation = new LibrarySimulation(1);
 
         do
         {
@@ -58,6 +59,10 @@ class Program
                             break;
                         }
                         LibraryManagerApp.DisplayBookInfo(foundBook);
+                        break;
+                    case 7:
+                        isbn = LibraryManagerApp.GetIsbnFromUser();
+                        librarySimulation.RunSimulationAsync(isbn).Wait();
                         break;
                     case 0:
                         Console.WriteLine("Exiting the application. Goodbye!");

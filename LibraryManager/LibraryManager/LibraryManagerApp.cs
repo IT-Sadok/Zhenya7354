@@ -16,6 +16,7 @@ namespace LibraryManager;
                 "4. Add book \n" +
                 "5. Remove book \n" +
                 "6. Find book \n" +
+                "7. Run library simulation \n" +
                 "0. Exit \n");
         }
         public static int GetIsbnFromUser()
@@ -41,7 +42,7 @@ namespace LibraryManager;
             Console.WriteLine("Provide book title or author: ");
             return Console.ReadLine() ?? string.Empty;
         }
-        public static void DisplayBookInfo(Book book)
+        public static void DisplayBookInfo(LibraryBook book)
         {
             Console.WriteLine($"ISBN: {book.Isbn}, Title: {book.Title}, Author: {book.Author}, Publication Year: {book.PublicationYear}, Status: {book.Status} \n");
         }
