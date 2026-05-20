@@ -6,29 +6,17 @@ namespace LibraryManager;
 
 internal class LibrarySimulation
 { 
-    private readonly SemaphoreSlim _semaphoreSlim;
     private readonly IFileManager _fileManager;
     private readonly List<LibraryBook> _books;
+    private readonly ILibrary _library;
 
-    public LibrarySimulation(int maxConcurrentOperations)
+    public LibrarySimulation(ILibrary library)
     {
-        _semaphoreSlim = new SemaphoreSlim(maxConcurrentOperations, maxConcurrentOperations);
         _fileManager = new FileManager();
         _books = _fileManager.LoadFromFile();
+        _library = library;
     }
 
-    public async Task UpdateBookTitleAsync(LibraryBook bookToUpdate, int taskId)
-    {
-        await _semaphoreSlim.WaitAsync();
-        try
-        {
-            bookToUpdate.Title = "Task " + taskId;
-        }
-        finally
-        {
-            _semaphoreSlim.Release();
-        }
-    }
 
     public async Task RunSimulationAsync(int isbn)
     {
@@ -38,16 +26,13 @@ internal class LibrarySimulation
 
         for(int i = 0; i < 100; i++)
         {
-            Task t = UpdateBookTitleAsync(bookToUpdate, i);
+            Task t = _library.UpdateBookTitleAsync(bookToUpdate, i);
             tasks.Add(t);
-            DisplayBookTitle(bookToUpdate);
+            _library.DisplayBookTitle(bookToUpdate);
         }
         await Task.WhenAll(tasks);
 
         _fileManager.SaveToFile(_books);
     }
-    private void DisplayBookTitle(LibraryBook book)
-    { 
-        Console.WriteLine($"Book with isbn {book.Isbn} has title: {book?.Title ?? "Not found"}");
-    }
+    
 }

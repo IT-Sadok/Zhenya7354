@@ -10,7 +10,7 @@ class Program
         int choice = 0, isbn = 0;
         var fileManager = new FileManager();
         Library library = new Library(fileManager);
-        LibrarySimulation librarySimulation = new LibrarySimulation(1);
+        LibrarySimulation librarySimulation = new LibrarySimulation(library);
 
         do
         {
