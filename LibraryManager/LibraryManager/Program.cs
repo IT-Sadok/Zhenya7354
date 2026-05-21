@@ -5,7 +5,7 @@
 
 class Program
 {
-    static void Main(string[] args)
+    static async Task Main(string[] args)
     {
         int choice = 0, isbn = 0;
         var fileManager = new FileManager();
@@ -36,19 +36,19 @@ class Program
                         break;
                     case 2:
                         isbn = LibraryManagerApp.GetIsbnFromUser();
-                        library.BorrowBook(isbn);
+                        await library.BorrowBookAsync(isbn);
                         break;
                     case 3:
                         isbn = LibraryManagerApp.GetIsbnFromUser();
-                        library.ReturnBook(isbn);
+                        await library.ReturnBookAsync(isbn);
                         break;
                     case 4:
                         LibraryBook book = LibraryManagerApp.GetBookInfoFromUser();
-                        library.AddBook(book);
+                        await library.AddBookAsync(book);
                         break;
                     case 5:
-                        LibraryManagerApp.GetIsbnFromUser();
-                        library.RemoveBook(isbn);
+                        isbn = LibraryManagerApp.GetIsbnFromUser();
+                        await library.RemoveBookAsync(isbn);
                         break;
                     case 6:
                         string query = LibraryManagerApp.GetSearchQueryFromUser();

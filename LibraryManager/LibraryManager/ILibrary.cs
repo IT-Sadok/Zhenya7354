@@ -7,11 +7,11 @@ namespace LibraryManager;
 internal interface ILibrary
 {
     public Task UpdateBookTitleAsync(LibraryBook bookToUpdate, int taskId);
-    public void AddBook(LibraryBook book);
-    public void RemoveBook(int isbn);
+    public Task AddBookAsync(LibraryBook book);
+    public Task RemoveBookAsync(int isbn);
     public LibraryBook? GetBookByAuthorOrTitle(string query);
     public List<LibraryBook> GetAllAvailableBooks();
-    public void BorrowBook(int isbn);
-    public void ReturnBook(int isbn);
+    public Task BorrowBookAsync(int isbn);
+    public Task ReturnBookAsync(int isbn);
     public void DisplayBookTitle(LibraryBook book);
 }

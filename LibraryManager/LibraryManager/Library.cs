@@ -23,18 +23,34 @@ class Library(IFileManager fileManager) : ILibrary
             _semaphoreSlim.Release();
         }
     }
-    public void AddBook(LibraryBook book)
+    public async Task AddBookAsync(LibraryBook book)
     {
-        _books.Add(book);
-        fileManager.SaveToFile(_books);
+        await _semaphoreSlim.WaitAsync();
+        try
+        {
+            _books.Add(book);
+            fileManager.SaveToFile(_books);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
     }
-    public void RemoveBook(int isbn)
+    public async Task RemoveBookAsync(int isbn)
     {
-        var bookToDelete = _books.FirstOrDefault(b => b.Isbn == isbn) ??
-            throw new Exception($" Book with isbn: {isbn} was not found\n");
+        await _semaphoreSlim.WaitAsync();
+        try
+        {
+            var bookToDelete = _books.FirstOrDefault(b => b.Isbn == isbn) ??
+                throw new Exception($" Book with isbn: {isbn} was not found\n");
 
-        _books.Remove(bookToDelete);
-        fileManager.SaveToFile(_books);
+            _books.Remove(bookToDelete);
+            fileManager.SaveToFile(_books);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
     }
 
     public LibraryBook? GetBookByAuthorOrTitle(string query)
@@ -47,20 +63,36 @@ class Library(IFileManager fileManager) : ILibrary
     {
         return _books.Where(b => b.Status == Status.Available).ToList();
     }
-    public void BorrowBook(int isbn)
+    public async Task BorrowBookAsync(int isbn)
     {
-        var bookToBorrow = _books.FirstOrDefault(b => b.Isbn == isbn) ??
-            throw new Exception($" Book with isbn: {isbn} was not found\n");
-        bookToBorrow.Status = Status.Borrowed;
-        fileManager.SaveToFile(_books);
+        await _semaphoreSlim.WaitAsync();
+        try
+        {
+            var bookToBorrow = _books.FirstOrDefault(b => b.Isbn == isbn) ??
+                throw new Exception($" Book with isbn: {isbn} was not found\n");
+            bookToBorrow.Status = Status.Borrowed;
+            fileManager.SaveToFile(_books);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
     }
 
-    public void ReturnBook(int isbn)
+    public async Task ReturnBookAsync(int isbn)
     {
-        var bookToReturn = _books.FirstOrDefault(b => b.Isbn == isbn) ??
-            throw new Exception($" Book with isbn: {isbn} was not found\n");
-        bookToReturn.Status = Status.Available;
-        fileManager.SaveToFile(_books);
+        await _semaphoreSlim.WaitAsync();
+        try
+        {
+            var bookToReturn = _books.FirstOrDefault(b => b.Isbn == isbn) ??
+                throw new Exception($" Book with isbn: {isbn} was not found\n");
+            bookToReturn.Status = Status.Available;
+            fileManager.SaveToFile(_books);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
     }
     public void DisplayBookTitle(LibraryBook book)
     {
