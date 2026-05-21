@@ -16,9 +16,11 @@ class FileManager : IFileManager
 
     public List<LibraryBook> LoadFromFile()
     {
-        if (!File.Exists(_path)) return new List<LibraryBook>();
+        if (!File.Exists(_path)) 
+            return new List<LibraryBook>();
         string json = File.ReadAllText(_path);
-        if (string.IsNullOrEmpty(json)) return new List<LibraryBook>();
+        if (string.IsNullOrEmpty(json))
+            return new List<LibraryBook>();
         return JsonSerializer.Deserialize<List<LibraryBook>>(json) ?? new List<LibraryBook>();
 
 
