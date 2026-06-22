@@ -10,22 +10,24 @@ public class PcMonitorService(IPcMonitorRepository pcMonitorRepository) : IPcMon
 {
     private readonly IPcMonitorRepository _pcMonitorRepository = pcMonitorRepository;
 
-    public async Task<List<PcMonitorEntity>> GetAllMonitorsAsync()
+    public async Task<List<PcMonitorEntity>> GetAllMonitorsAsync(CancellationToken cancellationToken)
     {
-        return await _pcMonitorRepository.GetAllMonitorsAsync();
+        return await _pcMonitorRepository.GetAllMonitorsAsync(cancellationToken);
     }
 
-    public async Task<PcMonitorEntity> GetMonitorByIdAsync(int id)
+    public async Task<PcMonitorEntity> GetMonitorByIdAsync(int id, CancellationToken cancellationToken)
     {
-        var monitor = await _pcMonitorRepository.GetMonitorByIdAsync(id) ??
+        var monitor = await _pcMonitorRepository.GetMonitorByIdAsync(id, cancellationToken) ??
             throw new KeyNotFoundException($"Monitor with ID {id} not found.");
 
         return monitor;
     }
 
-    public async Task<PcMonitorEntity> AddMonitorAsync(PcMonitorCreate dto)
+    public async Task<PcMonitorEntity> AddMonitorAsync(PcMonitorCreateRequest dto, CancellationToken cancellationToken)
     {
-        await EnsureBrandExistsAsync(dto.BrandId);
+        if (dto is null)
+            throw new ArgumentNullException("Monitor data is required.");
+        await EnsureBrandExistsAsync(dto.BrandId, cancellationToken);
 
         var monitor = new PcMonitorEntity
         {
@@ -41,9 +43,7 @@ public class PcMonitorService(IPcMonitorRepository pcMonitorRepository) : IPcMon
             BrightnessNits = dto.BrightnessNits,
             ContrastRatio = dto.ContrastRatio,
             ColorGamutP3 = dto.ColorGamutP3,
-            HasGSync = dto.HasGSync,
-            HasFreeSync = dto.HasFreeSync,
-            HasFreeSyncPremium = dto.HasFreeSyncPremium,
+            SyncTechnologies = dto.SyncTechnologies,
             HdmiPorts = dto.HdmiPorts,
             HdmiVersion = dto.HdmiVersion,
             DpPorts = dto.DpPorts,
@@ -53,20 +53,24 @@ public class PcMonitorService(IPcMonitorRepository pcMonitorRepository) : IPcMon
             HasSpeakers = dto.HasSpeakers,
             HeightAdjustable = dto.HeightAdjustable,
             VesaMount = dto.VesaMount,
-            PriceUsd = dto.PriceUsd
+            Currency = dto.Currency,
+            Price = dto.Price
         };
 
-        await _pcMonitorRepository.AddMonitorAsync(monitor);
-        await _pcMonitorRepository.SaveChangesAsync();
+        await _pcMonitorRepository.AddMonitorAsync(monitor, cancellationToken);
+        await _pcMonitorRepository.SaveChangesAsync(cancellationToken);
         return monitor;
     }
 
-    public async Task<PcMonitorEntity> UpdateMonitorAsync(int id, PcMonitorUpdate dto)
+    public async Task<PcMonitorEntity> UpdateMonitorAsync(int id, PcMonitorUpdateRequest dto, CancellationToken cancellationToken)
     {
-        var monitor = await _pcMonitorRepository.GetMonitorByIdAsync(id) ??
+        if (dto is null)
+            throw new ArgumentNullException("Monitor data is required.");
+
+        var monitor = await _pcMonitorRepository.GetMonitorByIdAsync(id, cancellationToken) ??
             throw new KeyNotFoundException($"Monitor with ID {id} not found.");
 
-        await EnsureBrandExistsAsync(dto.BrandId ?? monitor.BrandId);
+        await EnsureBrandExistsAsync(dto.BrandId ?? monitor.BrandId, cancellationToken);
 
         if (!string.IsNullOrWhiteSpace(dto.Name)) monitor.Name = dto.Name;
         if (dto.ScreenSizeInch.HasValue) monitor.ScreenSizeInch = dto.ScreenSizeInch.Value;
@@ -79,9 +83,7 @@ public class PcMonitorService(IPcMonitorRepository pcMonitorRepository) : IPcMon
         if (dto.BrightnessNits.HasValue) monitor.BrightnessNits = dto.BrightnessNits.Value;
         if (!string.IsNullOrWhiteSpace(dto.ContrastRatio)) monitor.ContrastRatio = dto.ContrastRatio;
         if (dto.ColorGamutP3.HasValue) monitor.ColorGamutP3 = dto.ColorGamutP3.Value;
-        if (dto.HasGSync.HasValue) monitor.HasGSync = dto.HasGSync.Value;
-        if (dto.HasFreeSync.HasValue) monitor.HasFreeSync = dto.HasFreeSync.Value;
-        if (dto.HasFreeSyncPremium.HasValue) monitor.HasFreeSyncPremium = dto.HasFreeSyncPremium.Value;
+        if (dto.SyncTechnologies != null) monitor.SyncTechnologies = dto.SyncTechnologies;
         if (dto.HdmiPorts.HasValue) monitor.HdmiPorts = dto.HdmiPorts.Value;
         if (!string.IsNullOrWhiteSpace(dto.HdmiVersion)) monitor.HdmiVersion = dto.HdmiVersion;
         if (dto.DpPorts.HasValue) monitor.DpPorts = dto.DpPorts.Value;
@@ -91,24 +93,25 @@ public class PcMonitorService(IPcMonitorRepository pcMonitorRepository) : IPcMon
         if (dto.HasSpeakers.HasValue) monitor.HasSpeakers = dto.HasSpeakers.Value;
         if (dto.HeightAdjustable.HasValue) monitor.HeightAdjustable = dto.HeightAdjustable.Value;
         if (!string.IsNullOrWhiteSpace(dto.VesaMount)) monitor.VesaMount = dto.VesaMount;
-        if (dto.PriceUsd.HasValue) monitor.PriceUsd = dto.PriceUsd.Value;
+        if(dto.Currency.HasValue) monitor.Currency = dto.Currency.Value;
+        if (dto.Price.HasValue) monitor.Price = dto.Price.Value;
 
-        await _pcMonitorRepository.SaveChangesAsync();
+        await _pcMonitorRepository.SaveChangesAsync(cancellationToken);
         return monitor;
     }
 
-    public async Task DeleteMonitorAsync(int id)
+    public async Task DeleteMonitorAsync(int id, CancellationToken cancellationToken)
     {
-        var monitor = await _pcMonitorRepository.GetMonitorByIdAsync(id) ??
+        var monitor = await _pcMonitorRepository.GetMonitorByIdAsync(id, cancellationToken) ??
             throw new KeyNotFoundException($"Monitor with ID {id} not found.");
 
-        await _pcMonitorRepository.DeleteMonitorAsync(monitor);
-        await _pcMonitorRepository.SaveChangesAsync();
+        await _pcMonitorRepository.DeleteMonitorAsync(monitor, cancellationToken);
+        await _pcMonitorRepository.SaveChangesAsync(cancellationToken);
     }
 
-    private async Task EnsureBrandExistsAsync(int brandId)
+    private async Task EnsureBrandExistsAsync(int brandId, CancellationToken cancellationToken)
     {
-        if (!await _pcMonitorRepository.BrandExistsAsync(brandId))
+        if (!await _pcMonitorRepository.BrandExistsAsync(brandId, cancellationToken))
         {
             throw new KeyNotFoundException("Brand with the specified ID does not exist.");
         }

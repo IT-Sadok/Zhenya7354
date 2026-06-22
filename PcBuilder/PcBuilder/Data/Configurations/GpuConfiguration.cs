@@ -9,8 +9,7 @@ public class GpuConfiguration : IEntityTypeConfiguration<GpuEntity>
 {
     public void Configure(EntityTypeBuilder<GpuEntity> builder)
     {
-        builder.ToTable("Gpu")
-            .Metadata.SetIsTableExcludedFromMigrations(true);
+        
 
         builder.HasOne(e => e.Brand)
             .WithMany()
@@ -20,6 +19,8 @@ public class GpuConfiguration : IEntityTypeConfiguration<GpuEntity>
             .HasConversion(
                v => v.ToString(),
                 v => Enum.Parse<GpuInterface>(v));
-
+        builder
+            .Property(e => e.Currency)
+            .HasConversion<string>();
     }
 }

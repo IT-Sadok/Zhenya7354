@@ -10,22 +10,24 @@ public class PcCaseService(IPcCaseRepository pcCaseRepository) : IPcCaseService
 {
     private readonly IPcCaseRepository _pcCaseRepository = pcCaseRepository;
 
-    public async Task<List<PcCaseEntity>> GetAllCasesAsync()
+    public async Task<List<PcCaseEntity>> GetAllCasesAsync(CancellationToken cancellationToken)
     {
-        return await _pcCaseRepository.GetAllCasesAsync();
+        return await _pcCaseRepository.GetAllCasesAsync(cancellationToken);
     }
 
-    public async Task<PcCaseEntity> GetCaseByIdAsync(int id)
+    public async Task<PcCaseEntity> GetCaseByIdAsync(int id, CancellationToken cancellationToken)
     {
-        var pcCase = await _pcCaseRepository.GetCaseByIdAsync(id) ??
+        var pcCase = await _pcCaseRepository.GetCaseByIdAsync(id, cancellationToken) ??
             throw new KeyNotFoundException($"Case with ID {id} not found.");
 
         return pcCase;
     }
 
-    public async Task<PcCaseEntity> AddCaseAsync(PcCaseCreate dto)
+    public async Task<PcCaseEntity> AddCaseAsync(PcCaseCreateRequest dto, CancellationToken cancellationToken)
     {
-        await EnsureBrandExistsAsync(dto.BrandId);
+        if (dto is null)
+            throw new ArgumentNullException("Case data is required.");
+        await EnsureBrandExistsAsync(dto.BrandId, cancellationToken);
 
         var pcCase = new PcCaseEntity
         {
@@ -45,20 +47,25 @@ public class PcCaseService(IPcCaseRepository pcCaseRepository) : IPcCaseService
             CaseDepthMm = dto.CaseDepthMm,
             HasGlassPanel = dto.HasGlassPanel,
             IncludedFans = dto.IncludedFans,
-            PriceUsd = dto.PriceUsd
+            ColorScheme = dto.ColorScheme,
+            Currency = dto.Currency,
+            Price = dto.Price
         };
 
-        await _pcCaseRepository.AddCaseAsync(pcCase);
-        await _pcCaseRepository.SaveChangesAsync();
+        await _pcCaseRepository.AddCaseAsync(pcCase, cancellationToken);
+        await _pcCaseRepository.SaveChangesAsync(cancellationToken);
         return pcCase;
     }
 
-    public async Task<PcCaseEntity> UpdateCaseAsync(int id, PcCaseUpdate dto)
+    public async Task<PcCaseEntity> UpdateCaseAsync(int id, PcCaseUpdateRequest dto, CancellationToken cancellationToken)
     {
-        var pcCase = await _pcCaseRepository.GetCaseByIdAsync(id) ??
+        if (dto is null)
+            throw new ArgumentNullException("Case data is required.");
+
+        var pcCase = await _pcCaseRepository.GetCaseByIdAsync(id, cancellationToken) ??
             throw new KeyNotFoundException($"Case with ID {id} not found.");
 
-        await EnsureBrandExistsAsync(dto.BrandId ?? pcCase.BrandId);
+        await EnsureBrandExistsAsync(dto.BrandId ?? pcCase.BrandId, cancellationToken);
 
         if (!string.IsNullOrWhiteSpace(dto.Name)) pcCase.Name = dto.Name;
         if (dto.SupportedFormFactors is { Count: > 0 }) pcCase.SupportedFormFactors = dto.SupportedFormFactors;
@@ -75,24 +82,26 @@ public class PcCaseService(IPcCaseRepository pcCaseRepository) : IPcCaseService
         if (dto.CaseDepthMm.HasValue) pcCase.CaseDepthMm = dto.CaseDepthMm.Value;
         if (dto.HasGlassPanel.HasValue) pcCase.HasGlassPanel = dto.HasGlassPanel.Value;
         if (dto.IncludedFans.HasValue) pcCase.IncludedFans = dto.IncludedFans.Value;
-        if (dto.PriceUsd.HasValue) pcCase.PriceUsd = dto.PriceUsd.Value;
+        if(dto.ColorScheme.HasValue) pcCase.ColorScheme = dto.ColorScheme.Value;
+        if(dto.Currency.HasValue) pcCase.Currency = dto.Currency.Value;
+        if (dto.Price.HasValue) pcCase.Price = dto.Price.Value;
 
-        await _pcCaseRepository.SaveChangesAsync();
+        await _pcCaseRepository.SaveChangesAsync(cancellationToken);
         return pcCase;
     }
 
-    public async Task DeleteCaseAsync(int id)
+    public async Task DeleteCaseAsync(int id, CancellationToken cancellationToken)
     {
-        var pcCase = await _pcCaseRepository.GetCaseByIdAsync(id) ??
+        var pcCase = await _pcCaseRepository.GetCaseByIdAsync(id, cancellationToken) ??
             throw new KeyNotFoundException($"Case with ID {id} not found.");
 
-        await _pcCaseRepository.DeleteCaseAsync(pcCase);
-        await _pcCaseRepository.SaveChangesAsync();
+        await _pcCaseRepository.DeleteCaseAsync(pcCase, cancellationToken);
+        await _pcCaseRepository.SaveChangesAsync(cancellationToken);
     }
 
-    private async Task EnsureBrandExistsAsync(int brandId)
+    private async Task EnsureBrandExistsAsync(int brandId, CancellationToken cancellationToken)
     {
-        if (!await _pcCaseRepository.BrandExistsAsync(brandId))
+        if (!await _pcCaseRepository.BrandExistsAsync(brandId, cancellationToken))
         {
             throw new KeyNotFoundException("Brand with the specified ID does not exist.");
         }

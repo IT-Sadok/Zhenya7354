@@ -9,8 +9,7 @@ public class HardDriveConfiguration : IEntityTypeConfiguration<HardDriveEntity>
 {
     public void Configure(EntityTypeBuilder<HardDriveEntity> builder)
     {
-        builder.ToTable("HardDrive")
-            .Metadata.SetIsTableExcludedFromMigrations(true);
+        
 
         builder.HasOne(e => e.Brand)
             .WithMany()
@@ -25,5 +24,11 @@ public class HardDriveConfiguration : IEntityTypeConfiguration<HardDriveEntity>
             .HasConversion(
             v => v.ToString(),
             v => Enum.Parse<StorageFormFactor>(v));
+        builder
+            .Property(e => e.Currency)
+            .HasConversion<string>();
+        builder
+            .Property(e => e.PcDriveType)
+            .HasConversion<string>();
     }
 }

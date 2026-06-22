@@ -14,139 +14,63 @@ public static class BuildEndpoints
     {
         var group = app.MapGroup("/builds");
 
-        group.MapGet("", async ([FromServices] IBuildService service, ClaimsPrincipal user) =>
+        group.MapGet(string.Empty, async ([FromServices] IBuildService service, CancellationToken cancellationToken) =>
         {
-            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId is null)
-            {
-                return Results.Unauthorized();
-            }
-            try
-            {
-                var builds = await service.GetUserBuildsAsync(userId);
-                return Results.Ok(builds);
-            }
-            catch (KeyNotFoundException ex) { return Results.NotFound(ex.Message); }
-        });
+            var builds = await service.GetUserBuildsAsync(cancellationToken);
+            return Results.Ok(builds);
+        }).RequireAuthorization();
 
-        group.MapGet("/{id}", async ([FromServices] IBuildService service, ClaimsPrincipal user, int id) =>
+        group.MapGet("/{id}", async ([FromServices] IBuildService service, int id, CancellationToken cancellationToken) =>
         {
-            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId is null)
+            var build = await service.GetBuildByIdAsync(id, cancellationToken);
+            return Results.Ok(build);
+        }).RequireAuthorization();
+
+        group.MapPost(string.Empty, async ([FromServices] IBuildService service, [FromBody] BuildRequest dto, CancellationToken cancellationToken) =>
+        {
+            var compatibilityCheckResult = await service.RunCompatibilityChecksAsync(dto, cancellationToken);
+            if (compatibilityCheckResult.IsSuccess)
             {
-                return Results.Unauthorized();
-            }
-            try
-            {
-                var build = await service.GetBuildByIdAsync(userId, id);
+                var build = await service.AddBuildAsync(dto, cancellationToken);
                 return Results.Ok(build);
             }
-            catch (KeyNotFoundException ex) { return Results.NotFound(ex.Message); }
+            return Results.BadRequest(new { Message = "Build has compatibility issues", compatibilityCheckResult.Issues });
 
-        });
+        }).RequireAuthorization();
 
-        group.MapPost("", async ([FromServices] IBuildService service, ClaimsPrincipal user, [FromBody] Build dto) =>
+        group.MapPut("/{id}", async ([FromServices] IBuildService service, int id, [FromBody] BuildRequest dto, CancellationToken cancellationToken) =>
         {
-
-            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId is null)
+            var compatibilityCheckResult = await service.RunCompatibilityChecksForBuildUpdateAsync(id, dto, cancellationToken);
+            if (compatibilityCheckResult.IsSuccess)
             {
-                return Results.Unauthorized();
-            }
-            try
-            {
-                var issues = await service.RunCompatibilityChecksAsync(dto);
-                if (issues.Any(i => i.Severity == CompatibilityServerity.Error))
-                {
-                    return Results.BadRequest(new { Message = "Build has compatibility issues", Issues = issues });
-                }
-                if (issues.Any(i => i.Severity == CompatibilityServerity.Warning))
-                {
-                    return Results.Ok(new { Message = "Build has compatibility warnings", Issues = issues });
-                }
-                var build = await service.AddBuildAsync(userId, dto);
+                var build = await service.UpdateBuildAsync(id, dto, cancellationToken);
                 return Results.Ok(build);
             }
-            catch (KeyNotFoundException ex) { return Results.NotFound(ex.Message); }
-        });
+            return Results.BadRequest(new { Message = "Build has compatibility issues", compatibilityCheckResult.Issues });
+        }).RequireAuthorization();
 
-        group.MapPut("/{id}", async ([FromServices] IBuildService service, ClaimsPrincipal user, int id, [FromBody] Build dto) =>
+        group.MapDelete("/{id}", async ([FromServices] IBuildService service, int id, CancellationToken cancellationToken) =>
         {
-            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId is null)
+            await service.DeleteBuildAsync(id, cancellationToken);
+            return Results.Ok();
+        }).RequireAuthorization();
+
+        group.MapPost("/{id}/components", async ([FromServices] IBuildService service, int id, [FromBody] BuildComponentRequest dto, CancellationToken cancellationToken) =>
+        {
+            var compatibilityCheckResult = await service.RunCompatibilityChecksForComponentUpdateAsync(id, dto, cancellationToken);
+            if (compatibilityCheckResult.IsSuccess)
             {
-                return Results.Unauthorized();
-            }
-            try
-            {
-                var issues = await service.RunCompatibilityChecksForUpdateAsync(id, userId, dto);
-                if (issues.Any(i => i.Severity == CompatibilityServerity.Error))
-                {
-                    return Results.BadRequest(new { Message = "Build has compatibility issues", Issues = issues });
-                }
-                if (issues.Any(i => i.Severity == CompatibilityServerity.Warning))
-                {
-                    return Results.Ok(new { Message = "Build has compatibility warnings", Issues = issues });
-                }
-                var build = await service.UpdateBuildAsync(id, userId, dto);
+                var build = await service.SetComponentAsync(id, dto, cancellationToken);
                 return Results.Ok(build);
             }
-            catch (KeyNotFoundException ex) { return Results.NotFound(ex.Message); }
-        });
+            return Results.BadRequest(new { Message = "Build has compatibility issues", Issues = compatibilityCheckResult.Issues });
+        }).RequireAuthorization();
 
-        group.MapDelete("/{id}", async ([FromServices] IBuildService service, ClaimsPrincipal user, int id) =>
+        group.MapDelete("/{id}/components", async ([FromServices] IBuildService service, int id, [FromBody] BuildComponentType componentType, CancellationToken cancellationToken) =>
         {
-            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId is null)
-            {
-                return Results.Unauthorized();
-            }
-            try
-            {
-                await service.DeleteBuildAsync(id, userId);
-                return Results.Ok();
-            }
-            catch (KeyNotFoundException ex) { return Results.NotFound(ex.Message); }
-        });
-
-        group.MapPost("/{id}/components", async ([FromServices] IBuildService service, ClaimsPrincipal user, int id, [FromBody] BuildComponent dto) =>
-        {
-            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId is null)
-            {
-                return Results.Unauthorized();
-            }
-            try
-            {
-                var issues = await service.RunCompatibilityChecksForComponentUpdateAsync(id, userId, dto);
-                if (issues.Any(i => i.Severity == CompatibilityServerity.Error))
-                {
-                    return Results.BadRequest(new { Message = "Build has compatibility issues", Issues = issues });
-                }
-                if (issues.Any(i => i.Severity == CompatibilityServerity.Warning))
-                {
-                    return Results.Ok(new { Message = "Build has compatibility warnings", Issues = issues });
-                }
-                var build = await service.SetComponentAsync(id, userId, dto);
-                return Results.Ok(build);
-            }
-            catch (KeyNotFoundException ex) { return Results.NotFound(ex.Message); }
-        });
-
-        group.MapDelete("/{id}/components", async ([FromServices] IBuildService service, ClaimsPrincipal user, int id, [FromBody] BuildComponentType componentType) =>
-        {
-            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId is null)
-            {
-                return Results.Unauthorized();
-            }
-            try
-            {
-                var build = await service.RemoveComponentAsync(id, userId, componentType);
-                return Results.Ok(build);
-            }
-            catch (KeyNotFoundException ex) { return Results.NotFound(ex.Message); }
-        });
+            var build = await service.RemoveComponentAsync(id, componentType, cancellationToken);
+            return Results.Ok(build);
+        }).RequireAuthorization();
 
         return app;
     }

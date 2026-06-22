@@ -11,57 +11,30 @@ public static class PcMonitorEndpoints
     {
         var group = webApplication.MapGroup("/pc-monitors");
 
-        group.MapGet("", async ([FromServices] IPcMonitorService service) => Results.Ok(await service.GetAllMonitorsAsync()));
-
-        group.MapGet("/{id}", async ([FromServices] IPcMonitorService service, int id) =>
+        group.MapGet(string.Empty, async ([FromServices] IPcMonitorService service, CancellationToken cancellationToken) =>
         {
-            try
-            {
-                return Results.Ok(await service.GetMonitorByIdAsync(id));
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return Results.NotFound(ex.Message);
-            }
+            return Results.Ok(await service.GetAllMonitorsAsync(cancellationToken));
         });
 
-        group.MapPost("", async ([FromServices] IPcMonitorService service, [FromBody] PcMonitorCreate dto) =>
+        group.MapGet("/{id}", async ([FromServices] IPcMonitorService service, int id, CancellationToken cancellationToken) =>
         {
-            if (dto is null) return Results.BadRequest("Monitor data is required");
-            try
-            {
-                return Results.Ok(await service.AddMonitorAsync(dto));
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return Results.BadRequest(ex.Message);
-            }
+                return Results.Ok(await service.GetMonitorByIdAsync(id, cancellationToken));
         });
 
-        group.MapPut("/{id}", async ([FromServices] IPcMonitorService service, [FromBody] PcMonitorUpdate dto, int id) =>
+        group.MapPost(string.Empty, async ([FromServices] IPcMonitorService service, [FromBody] PcMonitorCreateRequest dto, CancellationToken cancellationToken) =>
         {
-            if (dto is null) return Results.BadRequest("Monitor data is required");
-            try
-            {
-                return Results.Ok(await service.UpdateMonitorAsync(id, dto));
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return Results.BadRequest(ex.Message);
-            }
+                return Results.Ok(await service.AddMonitorAsync(dto, cancellationToken));
         });
 
-        group.MapDelete("/{id}", async ([FromServices] IPcMonitorService service, int id) =>
+        group.MapPut("/{id}", async ([FromServices] IPcMonitorService service, [FromBody] PcMonitorUpdateRequest dto, int id, CancellationToken cancellationToken) =>
         {
-            try
-            {
-                await service.DeleteMonitorAsync(id);
+                return Results.Ok(await service.UpdateMonitorAsync(id, dto, cancellationToken));
+        });
+
+        group.MapDelete("/{id}", async ([FromServices] IPcMonitorService service, int id, CancellationToken cancellationToken) =>
+        {
+                await service.DeleteMonitorAsync(id, cancellationToken);
                 return Results.Ok($"Monitor with id {id} deleted successfully");
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return Results.BadRequest(ex.Message);
-            }
         });
 
         return webApplication;

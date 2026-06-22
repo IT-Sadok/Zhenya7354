@@ -10,48 +10,48 @@ public class CompatibilityCheckRepository(PcDbContext context) : ICompatibilityC
     private readonly PcDbContext _context = context;
     
 
-    async Task<PcCaseEntity?> ICompatibilityCheckRepository.GetCaseByIdAsync(int caseId)
+    public async Task<PcCaseEntity?> GetCaseByIdAsync(int caseId, CancellationToken cancellationToken)
     {
-        return await _context.PcCase.AsNoTracking().FirstOrDefaultAsync(c => c.Id == caseId);
+        return await _context.PcCase.AsNoTracking().FirstOrDefaultAsync(c => c.Id == caseId, cancellationToken);
     }
 
-    async Task<CpuEntity?> ICompatibilityCheckRepository.GetCpuByIdAsync(int cpuId)
+    public async Task<CpuEntity?> GetCpuByIdAsync(int cpuId, CancellationToken cancellationToken)
     {
-        return await _context.Cpu.AsNoTracking().FirstOrDefaultAsync(c => c.Id == cpuId);
+        return await _context.Cpu.AsNoTracking().FirstOrDefaultAsync(c => c.Id == cpuId, cancellationToken);
     }
 
-    async Task<CpuCoolerEntity?> ICompatibilityCheckRepository.GetCpuCoolerByIdAsync(int cpuCoolerId)
+    public async Task<CpuCoolerEntity?> GetCpuCoolerByIdAsync(int cpuCoolerId, CancellationToken cancellationToken)
     {
-        return await _context.CpuCooler.AsNoTracking().FirstOrDefaultAsync(c => c.Id == cpuCoolerId);
+        return await _context.CpuCooler.AsNoTracking().FirstOrDefaultAsync(c => c.Id == cpuCoolerId, cancellationToken);
     }
 
-    async Task<GpuEntity?> ICompatibilityCheckRepository.GetGpuByIdAsync(int gpuId)
+    public async Task<GpuEntity?> GetGpuByIdAsync(int gpuId, CancellationToken cancellationToken)
     {
-        return await _context.Gpu.AsNoTracking().FirstOrDefaultAsync(c => c.Id == gpuId);
+        return await _context.Gpu.AsNoTracking().FirstOrDefaultAsync(c => c.Id == gpuId, cancellationToken);
     }
 
-    async Task<HardDriveEntity?> ICompatibilityCheckRepository.GetHardDriveByIdAsync(int hardDriveId)
+    public async Task<HardDriveEntity?> GetHardDriveByIdAsync(int hardDriveId, CancellationToken cancellationToken)
     {
-        return await _context.HardDrive.AsNoTracking().FirstOrDefaultAsync(c => c.Id == hardDriveId);
+        return await _context.HardDrive.AsNoTracking().FirstOrDefaultAsync(c => c.Id == hardDriveId, cancellationToken);
     }
 
-    async Task<PcMonitorEntity?> ICompatibilityCheckRepository.GetMonitorByIdAsync(int monitorId)
+    public async Task<PcMonitorEntity?> GetMonitorByIdAsync(int monitorId, CancellationToken cancellationToken)
     {
-        return await _context.PcMonitor.AsNoTracking().FirstOrDefaultAsync(c => c.Id == monitorId);
+        return await _context.PcMonitor.AsNoTracking().FirstOrDefaultAsync(c => c.Id == monitorId, cancellationToken);
     }
 
-    async Task<MotherboardEntity?> ICompatibilityCheckRepository.GetMotherboardByIdAsync(int motherboardId)
+    public async Task<MotherboardEntity?> GetMotherboardByIdAsync(int motherboardId, CancellationToken cancellationToken)
     {
-        return await _context.Motherboard.AsNoTracking().FirstOrDefaultAsync(c => c.Id == motherboardId);
+        return await _context.Motherboard.AsNoTracking().FirstOrDefaultAsync(c => c.Id == motherboardId, cancellationToken);
     }
 
-    async Task<PsuEntity?> ICompatibilityCheckRepository.GetPsuByIdAsync(int psuId)
+    public async Task<PsuEntity?> GetPsuByIdAsync(int psuId, CancellationToken cancellationToken)
     {
-        return await _context.Psu.AsNoTracking().FirstOrDefaultAsync(c => c.Id == psuId);
+        return await _context.Psu.AsNoTracking().FirstOrDefaultAsync(c => c.Id == psuId, cancellationToken);
     }
 
-    async Task<RamEntity?> ICompatibilityCheckRepository.GetRamByIdAsync(int ramId)
+    public async Task<RamEntity?> GetRamByIdAsync(int ramId, CancellationToken cancellationToken)
     {
-        return await _context.Ram.AsNoTracking().FirstOrDefaultAsync(c => c.Id == ramId);
+        return await _context.Ram.AsNoTracking().FirstOrDefaultAsync(c => c.Id == ramId, cancellationToken);
     }
 }

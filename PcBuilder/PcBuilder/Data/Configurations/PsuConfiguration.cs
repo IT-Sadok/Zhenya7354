@@ -9,8 +9,7 @@ public class PsuConfiguration : IEntityTypeConfiguration<PsuEntity>
 {
     public void Configure(EntityTypeBuilder<PsuEntity> builder)
     {
-        builder.ToTable("Psu")
-            .Metadata.SetIsTableExcludedFromMigrations(true);
+        
 
         builder.HasOne(e => e.Brand)
             .WithMany()
@@ -25,6 +24,9 @@ public class PsuConfiguration : IEntityTypeConfiguration<PsuEntity>
             .HasConversion(
                 v => v.ToString(),
                 v => Enum.Parse<PsuModular>(v));
+        builder
+            .Property(e => e.Currency)
+            .HasConversion<string>();
 
     }
 }

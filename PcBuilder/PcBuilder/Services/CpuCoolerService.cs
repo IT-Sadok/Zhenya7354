@@ -9,22 +9,24 @@ public class CpuCoolerService(ICpuCoolerRepository cpuCoolerRepository) : ICpuCo
 {
     private readonly ICpuCoolerRepository _cpuCoolerRepository = cpuCoolerRepository;
 
-    public async Task<List<CpuCoolerEntity>> GetAllCpuCoolersAsync()
+    public async Task<List<CpuCoolerEntity>> GetAllCpuCoolersAsync(CancellationToken cancellationToken)
     {
-        return await _cpuCoolerRepository.GetAllCpuCoolersAsync();
+        return await _cpuCoolerRepository.GetAllCpuCoolersAsync(cancellationToken);
     }
 
-    public async Task<CpuCoolerEntity> GetCpuCoolerByIdAsync(int id)
+    public async Task<CpuCoolerEntity> GetCpuCoolerByIdAsync(int id, CancellationToken cancellationToken)
     {
-        var cpuCooler = await _cpuCoolerRepository.GetCpuCoolerByIdAsync(id) ??
+        var cpuCooler = await _cpuCoolerRepository.GetCpuCoolerByIdAsync(id, cancellationToken) ??
             throw new KeyNotFoundException($"CPU cooler with ID {id} not found.");
 
         return cpuCooler;
     }
 
-    public async Task<CpuCoolerEntity> AddCpuCoolerAsync(CpuCoolerCreate dto)
+    public async Task<CpuCoolerEntity> AddCpuCoolerAsync(CpuCoolerCreateRequest dto, CancellationToken cancellationToken)
     {
-        await EnsureBrandExistsAsync(dto.BrandId);
+        if (dto is null)
+            throw new ArgumentNullException("Cpu cooler data is required");
+        await EnsureBrandExistsAsync(dto.BrandId, cancellationToken);
 
         var cpuCooler = new CpuCoolerEntity
         {
@@ -37,21 +39,25 @@ public class CpuCoolerService(ICpuCoolerRepository cpuCoolerRepository) : ICpuCo
             FanSizeMm = dto.FanSizeMm,
             MaxTdpWatts = dto.MaxTdpWatts,
             HeightMm = dto.HeightMm,
-            HasRgb = dto.HasRgb,
+            ColorScheme = dto.ColorScheme,
             NoiseLevelDb = dto.NoiseLevelDb,
-            PriceUsd = dto.PriceUsd
+            Currency = dto.Currency,
+            Price = dto.Price
         };
 
-        await _cpuCoolerRepository.AddCpuCoolerAsync(cpuCooler);
-        await _cpuCoolerRepository.SaveChangesAsync();
+        await _cpuCoolerRepository.AddCpuCoolerAsync(cpuCooler, cancellationToken);
+        await _cpuCoolerRepository.SaveChangesAsync(cancellationToken);
         return cpuCooler;
     }
 
-    public async Task<CpuCoolerEntity> UpdateCpuCoolerAsync(int id, CpuCoolerUpdate dto)
+    public async Task<CpuCoolerEntity> UpdateCpuCoolerAsync(int id, CpuCoolerUpdateRequest dto, CancellationToken cancellationToken)
     {
-        var cpuCooler = await _cpuCoolerRepository.GetCpuCoolerByIdAsync(id) ??
+        if (dto is null)
+            throw new ArgumentNullException("Cpu cooler data is required");
+
+        var cpuCooler = await _cpuCoolerRepository.GetCpuCoolerByIdAsync(id, cancellationToken) ??
             throw new KeyNotFoundException($"CPU cooler with ID {id} not found.");
-        await EnsureBrandExistsAsync(dto.BrandId ?? cpuCooler.BrandId);
+        await EnsureBrandExistsAsync(dto.BrandId ?? cpuCooler.BrandId, cancellationToken);
 
         if (!string.IsNullOrWhiteSpace(dto.Name)) cpuCooler.Name = dto.Name;
         if (dto.CoolerType.HasValue) cpuCooler.CoolerType = dto.CoolerType.Value;
@@ -61,26 +67,27 @@ public class CpuCoolerService(ICpuCoolerRepository cpuCoolerRepository) : ICpuCo
         if (dto.FanSizeMm.HasValue) cpuCooler.FanSizeMm = dto.FanSizeMm.Value;
         if (dto.MaxTdpWatts.HasValue) cpuCooler.MaxTdpWatts = dto.MaxTdpWatts.Value;
         if (dto.HeightMm.HasValue) cpuCooler.HeightMm = dto.HeightMm.Value;
-        if (dto.HasRgb.HasValue) cpuCooler.HasRgb = dto.HasRgb.Value;
+        if (dto.ColorScheme.HasValue) cpuCooler.ColorScheme = dto.ColorScheme.Value;
         if (dto.NoiseLevelDb.HasValue) cpuCooler.NoiseLevelDb = dto.NoiseLevelDb.Value;
-        if (dto.PriceUsd.HasValue) cpuCooler.PriceUsd = dto.PriceUsd.Value;
+        if (dto.Currency.HasValue) cpuCooler.Currency = dto.Currency.Value;
+        if (dto.Price.HasValue) cpuCooler.Price = dto.Price.Value;
 
-        await _cpuCoolerRepository.SaveChangesAsync();
+        await _cpuCoolerRepository.SaveChangesAsync(cancellationToken);
         return cpuCooler;
     }
 
-    public async Task DeleteCpuCoolerAsync(int id)
+    public async Task DeleteCpuCoolerAsync(int id, CancellationToken cancellationToken)
     {
-        var cpuCooler = await _cpuCoolerRepository.GetCpuCoolerByIdAsync(id) ??
+        var cpuCooler = await _cpuCoolerRepository.GetCpuCoolerByIdAsync(id, cancellationToken) ??
             throw new KeyNotFoundException($"CPU cooler with ID {id} not found.");
 
-        await _cpuCoolerRepository.DeleteCpuCoolerAsync(cpuCooler);
-        await _cpuCoolerRepository.SaveChangesAsync();
+        await _cpuCoolerRepository.DeleteCpuCoolerAsync(cpuCooler, cancellationToken);
+        await _cpuCoolerRepository.SaveChangesAsync(cancellationToken);
     }
 
-    private async Task EnsureBrandExistsAsync(int brandId)
+    private async Task EnsureBrandExistsAsync(int brandId, CancellationToken cancellationToken)
     {
-        if (!await _cpuCoolerRepository.BrandExistsAsync(brandId))
+        if (!await _cpuCoolerRepository.BrandExistsAsync(brandId, cancellationToken))
         {
             throw new KeyNotFoundException("Brand with the specified ID does not exist.");
         }

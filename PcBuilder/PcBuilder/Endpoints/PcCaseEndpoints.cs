@@ -11,57 +11,30 @@ public static class PcCaseEndpoints
     {
         var group = webApplication.MapGroup("/pc-cases");
 
-        group.MapGet("", async ([FromServices] IPcCaseService service) => Results.Ok(await service.GetAllCasesAsync()));
-
-        group.MapGet("/{id}", async ([FromServices] IPcCaseService service, int id) =>
+        group.MapGet(string.Empty, async ([FromServices] IPcCaseService service, CancellationToken cancellationToken) =>
         {
-            try
-            {
-                return Results.Ok(await service.GetCaseByIdAsync(id));
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return Results.NotFound(ex.Message);
-            }
+            return Results.Ok(await service.GetAllCasesAsync(cancellationToken));
         });
 
-        group.MapPost("", async ([FromServices] IPcCaseService service, [FromBody] PcCaseCreate dto) =>
+        group.MapGet("/{id}", async ([FromServices] IPcCaseService service, int id, CancellationToken cancellationToken) =>
         {
-            if (dto is null) return Results.BadRequest("Case data is required");
-            try
-            {
-                return Results.Ok(await service.AddCaseAsync(dto));
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return Results.BadRequest(ex.Message);
-            }
+                return Results.Ok(await service.GetCaseByIdAsync(id, cancellationToken));
         });
 
-        group.MapPut("/{id}", async ([FromServices] IPcCaseService service, [FromBody] PcCaseUpdate dto, int id) =>
+        group.MapPost(string.Empty, async ([FromServices] IPcCaseService service, [FromBody] PcCaseCreateRequest dto, CancellationToken cancellationToken) =>
         {
-            if (dto is null) return Results.BadRequest("Case data is required");
-            try
-            {
-                return Results.Ok(await service.UpdateCaseAsync(id, dto));
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return Results.BadRequest(ex.Message);
-            }
+                return Results.Ok(await service.AddCaseAsync(dto, cancellationToken));
         });
 
-        group.MapDelete("/{id}", async ([FromServices] IPcCaseService service, int id) =>
+        group.MapPut("/{id}", async ([FromServices] IPcCaseService service, [FromBody] PcCaseUpdateRequest dto, int id, CancellationToken cancellationToken) =>
         {
-            try
-            {
-                await service.DeleteCaseAsync(id);
+                return Results.Ok(await service.UpdateCaseAsync(id, dto, cancellationToken));
+        });
+
+        group.MapDelete("/{id}", async ([FromServices] IPcCaseService service, int id, CancellationToken cancellationToken) =>
+        {
+                await service.DeleteCaseAsync(id, cancellationToken);
                 return Results.Ok($"Case with id {id} deleted successfully");
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return Results.BadRequest(ex.Message);
-            }
         });
 
         return webApplication;

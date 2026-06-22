@@ -10,22 +10,25 @@ public class RamService(IRamRepository ramRepository) : IRamService
 {
     private readonly IRamRepository _ramRepository = ramRepository;
 
-    public async Task<List<RamEntity>> GetAllRamAsync()
+    public async Task<List<RamEntity>> GetAllRamAsync(CancellationToken cancellationToken)
     {
-        return await _ramRepository.GetAllRamAsync();
+        return await _ramRepository.GetAllRamAsync(cancellationToken);
     }
 
-    public async Task<RamEntity> GetRamByIdAsync(int id)
+    public async Task<RamEntity> GetRamByIdAsync(int id, CancellationToken cancellationToken)
     {
-        var ram = await _ramRepository.GetRamByIdAsync(id) ??
+        var ram = await _ramRepository.GetRamByIdAsync(id, cancellationToken) ??
             throw new KeyNotFoundException($"RAM with ID {id} not found.");
 
         return ram;
     }
 
-    public async Task<RamEntity> AddRamAsync(RamCreate dto)
+    public async Task<RamEntity> AddRamAsync(RamCreateRequest dto, CancellationToken cancellationToken)
     {
-        await EnsureBrandExistsAsync(dto.BrandId);
+        if (dto is null)
+            throw new ArgumentNullException("RAM data is required.");
+
+        await EnsureBrandExistsAsync(dto.BrandId, cancellationToken);
 
         var ram = new RamEntity
         {
@@ -37,23 +40,27 @@ public class RamService(IRamRepository ramRepository) : IRamService
             SpeedMhz = dto.SpeedMhz,
             CasLatency = dto.CasLatency,
             Voltage = dto.Voltage,
-            HasRgb = dto.HasRgb,
+            ColorScheme = dto.ColorScheme,
             HasEcc = dto.HasEcc,
             HeightMm = dto.HeightMm,
-            PriceUsd = dto.PriceUsd
+            Currency = dto.Currency,
+            Price = dto.Price
         };
 
-        await _ramRepository.AddRamAsync(ram);
-        await _ramRepository.SaveChangesAsync();
+        await _ramRepository.AddRamAsync(ram, cancellationToken);
+        await _ramRepository.SaveChangesAsync(cancellationToken);
         return ram;
     }
 
-    public async Task<RamEntity> UpdateRamAsync(int id, RamUpdate dto)
+    public async Task<RamEntity> UpdateRamAsync(int id, RamUpdateRequest dto, CancellationToken cancellationToken)
     {
-        var ram = await _ramRepository.GetRamByIdAsync(id) ??
+        if (dto is null)
+            throw new ArgumentNullException("RAM data is required.");
+
+        var ram = await _ramRepository.GetRamByIdAsync(id, cancellationToken) ??
             throw new KeyNotFoundException($"RAM with ID {id} not found.");
 
-        await EnsureBrandExistsAsync(dto.BrandId ?? ram.BrandId);
+        await EnsureBrandExistsAsync(dto.BrandId ?? ram.BrandId, cancellationToken);
 
         if (!string.IsNullOrWhiteSpace(dto.Name)) ram.Name = dto.Name;
         if (dto.MemoryType.HasValue) ram.MemoryType = dto.MemoryType.Value;
@@ -62,27 +69,28 @@ public class RamService(IRamRepository ramRepository) : IRamService
         if (dto.SpeedMhz.HasValue) ram.SpeedMhz = dto.SpeedMhz.Value;
         if (dto.CasLatency.HasValue) ram.CasLatency = dto.CasLatency.Value;
         if (dto.Voltage.HasValue) ram.Voltage = dto.Voltage.Value;
-        if (dto.HasRgb.HasValue) ram.HasRgb = dto.HasRgb.Value;
+        if (dto.ColorScheme.HasValue) ram.ColorScheme = dto.ColorScheme.Value;
         if (dto.HasEcc.HasValue) ram.HasEcc = dto.HasEcc.Value;
         if (dto.HeightMm.HasValue) ram.HeightMm = dto.HeightMm.Value;
-        if (dto.PriceUsd.HasValue) ram.PriceUsd = dto.PriceUsd.Value;
+        if(dto.Currency.HasValue) ram.Currency = dto.Currency.Value;
+        if (dto.Price.HasValue) ram.Price = dto.Price.Value;
 
-        await _ramRepository.SaveChangesAsync();
+        await _ramRepository.SaveChangesAsync(cancellationToken);
         return ram;
     }
 
-    public async Task DeleteRamAsync(int id)
+    public async Task DeleteRamAsync(int id, CancellationToken cancellationToken)
     {
-        var ram = await _ramRepository.GetRamByIdAsync(id) ??
+        var ram = await _ramRepository.GetRamByIdAsync(id, cancellationToken) ??
             throw new KeyNotFoundException($"RAM with ID {id} not found.");
 
-        await _ramRepository.DeleteRamAsync(ram);
-        await _ramRepository.SaveChangesAsync();
+        await _ramRepository.DeleteRamAsync(ram, cancellationToken);
+        await _ramRepository.SaveChangesAsync(cancellationToken);
     }
 
-    private async Task EnsureBrandExistsAsync(int brandId)
+    private async Task EnsureBrandExistsAsync(int brandId, CancellationToken cancellationToken)
     {
-        if (!await _ramRepository.BrandExistsAsync(brandId))
+        if (!await _ramRepository.BrandExistsAsync(brandId, cancellationToken))
         {
             throw new KeyNotFoundException("Brand with the specified ID does not exist.");
         }

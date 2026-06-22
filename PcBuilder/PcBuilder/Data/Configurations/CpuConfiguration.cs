@@ -9,9 +9,7 @@ public class CpuConfiguration : IEntityTypeConfiguration<CpuEntity>
 {
     public void Configure(EntityTypeBuilder<CpuEntity> builder)
     {
-        builder.ToTable("Cpu")
-            .Metadata.SetIsTableExcludedFromMigrations(true);
-
+        
         builder.HasOne(e => e.Brand)
             .WithMany()
             .HasForeignKey(e => e.BrandId);
@@ -26,5 +24,8 @@ public class CpuConfiguration : IEntityTypeConfiguration<CpuEntity>
             .HasConversion(
                 v => v.ToString(),
                 v => Enum.Parse<MemoryType>(v));
+        builder
+            .Property(e => e.Currency)
+            .HasConversion<string>();
     }
 }

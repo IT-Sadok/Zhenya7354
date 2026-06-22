@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
-using PcBuilder.Data;
+using PcBuilder.Data.Seeding;
+using PcBuilder.Data.Seeding.Interfaces;
 using PcBuilder.Endpoints;
+using PcBuilder.Extensions;
 using PcBuilder.Extentions;
 using PcBuilder.Services;
 using Scalar.AspNetCore;
@@ -12,15 +14,17 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
 builder.AddAppServices();
+builder.AddSeeders();
+builder.AddRepositories();
+builder.AddExceptionsServices();
 builder.AddIdentityAndJwt();
 
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<PcDbContext>();
-    await db.Database.MigrateAsync();
-    await DbSeeder.SeedRolesAsync(scope.ServiceProvider);
+    var seeder = scope.ServiceProvider.GetRequiredService<IDbSeeder>();
+    await seeder.SeedDataAsync(scope.ServiceProvider);
 }
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -32,7 +36,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.UseExceptionHandler();
 
 app.MapAuthEndpoints();
 app.MapCpuEndpoints();

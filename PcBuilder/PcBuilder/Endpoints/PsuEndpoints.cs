@@ -11,57 +11,30 @@ public static class PsuEndpoints
     {
         var group = webApplication.MapGroup("/psus");
 
-        group.MapGet("", async ([FromServices] IPsuService service) => Results.Ok(await service.GetAllPsusAsync()));
-
-        group.MapGet("/{id}", async ([FromServices] IPsuService service, int id) =>
+        group.MapGet(string.Empty, async ([FromServices] IPsuService service, CancellationToken cancellationToken) =>
         {
-            try
-            {
-                return Results.Ok(await service.GetPsuByIdAsync(id));
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return Results.NotFound(ex.Message);
-            }
+            return Results.Ok(await service.GetAllPsusAsync(cancellationToken));
         });
 
-        group.MapPost("", async ([FromServices] IPsuService service, [FromBody] PsuCreate dto) =>
+        group.MapGet("/{id}", async ([FromServices] IPsuService service, int id, CancellationToken cancellationToken) =>
         {
-            if (dto is null) return Results.BadRequest("Psu data is required");
-            try
-            {
-                return Results.Ok(await service.AddPsuAsync(dto));
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return Results.BadRequest(ex.Message);
-            }
+                return Results.Ok(await service.GetPsuByIdAsync(id, cancellationToken));
         });
 
-        group.MapPut("/{id}", async ([FromServices] IPsuService service, [FromBody] PsuUpdate dto, int id) =>
+        group.MapPost(string.Empty, async ([FromServices] IPsuService service, [FromBody] PsuCreateRequest dto, CancellationToken cancellationToken) =>
         {
-            if (dto is null) return Results.BadRequest("Psu data is required");
-            try
-            {
-                return Results.Ok(await service.UpdatePsuAsync(id, dto));
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return Results.BadRequest(ex.Message);
-            }
+                return Results.Ok(await service.AddPsuAsync(dto, cancellationToken));
         });
 
-        group.MapDelete("/{id}", async ([FromServices] IPsuService service, int id) =>
+        group.MapPut("/{id}", async ([FromServices] IPsuService service, [FromBody] PsuUpdateRequest dto, int id, CancellationToken cancellationToken) =>
         {
-            try
-            {
-                await service.DeletePsuAsync(id);
+                return Results.Ok(await service.UpdatePsuAsync(id, dto, cancellationToken));
+        });
+
+        group.MapDelete("/{id}", async ([FromServices] IPsuService service, int id, CancellationToken cancellationToken) =>
+        {
+                await service.DeletePsuAsync(id, cancellationToken);
                 return Results.Ok($"Psu with id {id} deleted successfully");
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return Results.BadRequest(ex.Message);
-            }
         });
 
         return webApplication;

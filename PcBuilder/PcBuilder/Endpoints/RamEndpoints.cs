@@ -11,57 +11,30 @@ public static class RamEndpoints
     {
         var group = webApplication.MapGroup("/rams");
 
-        group.MapGet("", async ([FromServices] IRamService service) => Results.Ok(await service.GetAllRamAsync()));
-
-        group.MapGet("/{id}", async ([FromServices] IRamService service, int id) =>
+        group.MapGet(string.Empty, async ([FromServices] IRamService service, CancellationToken cancellationToken) =>
         {
-            try
-            {
-                return Results.Ok(await service.GetRamByIdAsync(id));
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return Results.NotFound(ex.Message);
-            }
+            return Results.Ok(await service.GetAllRamAsync(cancellationToken));
         });
 
-        group.MapPost("", async ([FromServices] IRamService service, [FromBody] RamCreate dto) =>
+        group.MapGet("/{id}", async ([FromServices] IRamService service, int id, CancellationToken cancellationToken) =>
         {
-            if (dto is null) return Results.BadRequest("Ram data is required");
-            try
-            {
-                return Results.Ok(await service.AddRamAsync(dto));
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return Results.BadRequest(ex.Message);
-            }
+                return Results.Ok(await service.GetRamByIdAsync(id, cancellationToken));
         });
 
-        group.MapPut("/{id}", async ([FromServices] IRamService service, [FromBody] RamUpdate dto, int id) =>
+        group.MapPost(string.Empty, async ([FromServices] IRamService service, [FromBody] RamCreateRequest dto, CancellationToken cancellationToken) =>
         {
-            if (dto is null) return Results.BadRequest("Ram data is required");
-            try
-            {
-                return Results.Ok(await service.UpdateRamAsync(id, dto));
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return Results.BadRequest(ex.Message);
-            }
+                return Results.Ok(await service.AddRamAsync(dto, cancellationToken));
         });
 
-        group.MapDelete("/{id}", async ([FromServices] IRamService service, int id) =>
+        group.MapPut("/{id}", async ([FromServices] IRamService service, [FromBody] RamUpdateRequest dto, int id, CancellationToken cancellationToken) =>
         {
-            try
-            {
-                await service.DeleteRamAsync(id);
+                return Results.Ok(await service.UpdateRamAsync(id, dto, cancellationToken));
+        });
+
+        group.MapDelete("/{id}", async ([FromServices] IRamService service, int id, CancellationToken cancellationToken) =>
+        {
+                await service.DeleteRamAsync(id, cancellationToken);
                 return Results.Ok($"Ram with id {id} deleted successfully");
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return Results.BadRequest(ex.Message);
-            }
         });
 
         return webApplication;

@@ -9,8 +9,7 @@ public class RamConfiguration : IEntityTypeConfiguration<RamEntity>
 {
     public void Configure(EntityTypeBuilder<RamEntity> builder)
     {
-        builder.ToTable("Ram")
-            .Metadata.SetIsTableExcludedFromMigrations(true);
+        
 
         builder.HasOne(e => e.Brand)
             .WithMany()
@@ -20,5 +19,11 @@ public class RamConfiguration : IEntityTypeConfiguration<RamEntity>
             .HasConversion(
                v => v.ToString(),
                 v => Enum.Parse<MemoryType>(v));
+        builder
+            .Property(e => e.Currency)
+            .HasConversion<string>();
+        builder
+            .Property(e => e.ColorScheme)
+            .HasConversion<string>();
     }
 }

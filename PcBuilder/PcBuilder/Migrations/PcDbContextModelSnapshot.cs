@@ -187,10 +187,7 @@ namespace PcBuilder.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Brand", null, t =>
-                        {
-                            t.ExcludeFromMigrations();
-                        });
+                    b.ToTable("Brand");
                 });
 
             modelBuilder.Entity("PcBuilder.Entities.BuildEntity", b =>
@@ -270,8 +267,15 @@ namespace PcBuilder.Migrations
                     b.Property<int>("BrandId")
                         .HasColumnType("integer");
 
+                    b.Property<string>("ColorScheme")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("CoolerType")
                         .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Currency")
                         .HasColumnType("text");
 
                     b.Property<int>("FanCount")
@@ -279,9 +283,6 @@ namespace PcBuilder.Migrations
 
                     b.Property<int>("FanSizeMm")
                         .HasColumnType("integer");
-
-                    b.Property<bool>("HasRgb")
-                        .HasColumnType("boolean");
 
                     b.Property<int?>("HeightMm")
                         .HasColumnType("integer");
@@ -296,24 +297,21 @@ namespace PcBuilder.Migrations
                     b.Property<double?>("NoiseLevelDb")
                         .HasColumnType("double precision");
 
-                    b.Property<decimal?>("PriceUsd")
+                    b.Property<decimal?>("Price")
                         .HasColumnType("numeric");
 
                     b.Property<int?>("RadiatorSizeMm")
                         .HasColumnType("integer");
 
-                    b.Property<List<string>>("SocketsSupported")
+                    b.PrimitiveCollection<int[]>("SocketsSupported")
                         .IsRequired()
-                        .HasColumnType("text[]");
+                        .HasColumnType("integer[]");
 
                     b.HasKey("Id");
 
                     b.HasIndex("BrandId");
 
-                    b.ToTable("CpuCooler", null, t =>
-                        {
-                            t.ExcludeFromMigrations();
-                        });
+                    b.ToTable("CpuCooler");
                 });
 
             modelBuilder.Entity("PcBuilder.Entities.CpuEntity", b =>
@@ -339,6 +337,9 @@ namespace PcBuilder.Migrations
 
                     b.Property<int>("Cores")
                         .HasColumnType("integer");
+
+                    b.Property<string>("Currency")
+                        .HasColumnType("text");
 
                     b.Property<string>("IgpuModel")
                         .HasColumnType("text");
@@ -381,7 +382,7 @@ namespace PcBuilder.Migrations
                     b.Property<string>("PcieVersion")
                         .HasColumnType("text");
 
-                    b.Property<decimal?>("PriceUsd")
+                    b.Property<decimal?>("Price")
                         .HasColumnType("numeric");
 
                     b.Property<string>("Socket")
@@ -398,10 +399,7 @@ namespace PcBuilder.Migrations
 
                     b.HasIndex("BrandId");
 
-                    b.ToTable("Cpu", null, t =>
-                        {
-                            t.ExcludeFromMigrations();
-                        });
+                    b.ToTable("Cpu");
                 });
 
             modelBuilder.Entity("PcBuilder.Entities.GpuEntity", b =>
@@ -427,6 +425,12 @@ namespace PcBuilder.Migrations
                     b.Property<double>("CardSlots")
                         .HasColumnType("double precision");
 
+                    b.Property<int>("ColorScheme")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Currency")
+                        .HasColumnType("text");
+
                     b.Property<string>("GpuChip")
                         .IsRequired()
                         .HasColumnType("text");
@@ -434,9 +438,6 @@ namespace PcBuilder.Migrations
                     b.Property<string>("GpuInterface")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<bool>("HasRgb")
-                        .HasColumnType("boolean");
 
                     b.Property<double?>("MemoryBandwithGb")
                         .HasColumnType("double precision");
@@ -477,10 +478,7 @@ namespace PcBuilder.Migrations
 
                     b.HasIndex("BrandId");
 
-                    b.ToTable("Gpu", null, t =>
-                        {
-                            t.ExcludeFromMigrations();
-                        });
+                    b.ToTable("Gpu");
                 });
 
             modelBuilder.Entity("PcBuilder.Entities.HardDriveEntity", b =>
@@ -500,6 +498,9 @@ namespace PcBuilder.Migrations
                     b.Property<int>("CapacityGb")
                         .HasColumnType("integer");
 
+                    b.Property<string>("Currency")
+                        .HasColumnType("text");
+
                     b.Property<string>("DriveInterface")
                         .IsRequired()
                         .HasColumnType("text");
@@ -508,17 +509,18 @@ namespace PcBuilder.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<bool>("IsSsd")
-                        .HasColumnType("boolean");
-
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PcDriveType")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<double?>("PowerWatts")
                         .HasColumnType("double precision");
 
-                    b.Property<decimal?>("PriceUsd")
+                    b.Property<decimal?>("Price")
                         .HasColumnType("numeric");
 
                     b.Property<int?>("ReadSpeedMbS")
@@ -537,10 +539,7 @@ namespace PcBuilder.Migrations
 
                     b.HasIndex("BrandId");
 
-                    b.ToTable("HardDrive", null, t =>
-                        {
-                            t.ExcludeFromMigrations();
-                        });
+                    b.ToTable("HardDrive");
                 });
 
             modelBuilder.Entity("PcBuilder.Entities.MotherboardEntity", b =>
@@ -559,6 +558,9 @@ namespace PcBuilder.Migrations
 
                     b.Property<string>("Chipset")
                         .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Currency")
                         .HasColumnType("text");
 
                     b.Property<int>("FanHeaders")
@@ -603,7 +605,7 @@ namespace PcBuilder.Migrations
                     b.Property<int>("PcieX1Slots")
                         .HasColumnType("integer");
 
-                    b.Property<decimal?>("PriceUsd")
+                    b.Property<decimal?>("Price")
                         .HasColumnType("numeric");
 
                     b.Property<bool>("RearDisplayPort")
@@ -638,10 +640,7 @@ namespace PcBuilder.Migrations
 
                     b.HasIndex("BrandId");
 
-                    b.ToTable("Motherboard", null, t =>
-                        {
-                            t.ExcludeFromMigrations();
-                        });
+                    b.ToTable("Motherboard");
                 });
 
             modelBuilder.Entity("PcBuilder.Entities.PcCaseEntity", b =>
@@ -663,6 +662,13 @@ namespace PcBuilder.Migrations
 
                     b.Property<int?>("CaseWidthMm")
                         .HasColumnType("integer");
+
+                    b.Property<string>("ColorScheme")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Currency")
+                        .HasColumnType("text");
 
                     b.Property<int>("DriveBays25Inch")
                         .HasColumnType("integer");
@@ -695,25 +701,22 @@ namespace PcBuilder.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<decimal?>("PriceUsd")
+                    b.Property<decimal?>("Price")
                         .HasColumnType("numeric");
 
                     b.PrimitiveCollection<List<string>>("RadiatorSupportMm")
                         .IsRequired()
                         .HasColumnType("text[]");
 
-                    b.Property<List<string>>("SupportedFormFactors")
+                    b.PrimitiveCollection<int[]>("SupportedFormFactors")
                         .IsRequired()
-                        .HasColumnType("text[]");
+                        .HasColumnType("integer[]");
 
                     b.HasKey("Id");
 
                     b.HasIndex("BrandId");
 
-                    b.ToTable("PcCase", null, t =>
-                        {
-                            t.ExcludeFromMigrations();
-                        });
+                    b.ToTable("PcCase");
                 });
 
             modelBuilder.Entity("PcBuilder.Entities.PcMonitorEntity", b =>
@@ -736,20 +739,14 @@ namespace PcBuilder.Migrations
                     b.Property<string>("ContrastRatio")
                         .HasColumnType("text");
 
+                    b.Property<string>("Currency")
+                        .HasColumnType("text");
+
                     b.Property<int>("DpPorts")
                         .HasColumnType("integer");
 
                     b.Property<string>("DpVersion")
                         .HasColumnType("text");
-
-                    b.Property<bool>("HasFreeSync")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("HasFreeSyncPremium")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("HasGSync")
-                        .HasColumnType("boolean");
 
                     b.Property<bool>("HasSpeakers")
                         .HasColumnType("boolean");
@@ -777,7 +774,7 @@ namespace PcBuilder.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<decimal?>("PriceUsd")
+                    b.Property<decimal?>("Price")
                         .HasColumnType("numeric");
 
                     b.Property<int>("RefreshRateHz")
@@ -795,6 +792,10 @@ namespace PcBuilder.Migrations
                     b.Property<double>("ScreenSizeInch")
                         .HasColumnType("double precision");
 
+                    b.PrimitiveCollection<int[]>("SyncTechnologies")
+                        .IsRequired()
+                        .HasColumnType("integer[]");
+
                     b.Property<int>("UsbCPorts")
                         .HasColumnType("integer");
 
@@ -806,10 +807,7 @@ namespace PcBuilder.Migrations
 
                     b.HasIndex("BrandId");
 
-                    b.ToTable("PcMonitor", null, t =>
-                        {
-                            t.ExcludeFromMigrations();
-                        });
+                    b.ToTable("PcMonitor");
                 });
 
             modelBuilder.Entity("PcBuilder.Entities.PsuEntity", b =>
@@ -826,6 +824,9 @@ namespace PcBuilder.Migrations
 
                     b.Property<int>("BrandId")
                         .HasColumnType("integer");
+
+                    b.Property<string>("Currency")
+                        .HasColumnType("text");
 
                     b.Property<string>("Efficiency")
                         .IsRequired()
@@ -854,7 +855,7 @@ namespace PcBuilder.Migrations
                     b.Property<int>("Pcie8PinConnectors")
                         .HasColumnType("integer");
 
-                    b.Property<decimal?>("PriceUsd")
+                    b.Property<decimal?>("Price")
                         .HasColumnType("numeric");
 
                     b.Property<int>("SataConnectors")
@@ -867,10 +868,7 @@ namespace PcBuilder.Migrations
 
                     b.HasIndex("BrandId");
 
-                    b.ToTable("Psu", null, t =>
-                        {
-                            t.ExcludeFromMigrations();
-                        });
+                    b.ToTable("Psu");
                 });
 
             modelBuilder.Entity("PcBuilder.Entities.RamEntity", b =>
@@ -890,10 +888,14 @@ namespace PcBuilder.Migrations
                     b.Property<int?>("CasLatency")
                         .HasColumnType("integer");
 
-                    b.Property<bool>("HasEcc")
-                        .HasColumnType("boolean");
+                    b.Property<string>("ColorScheme")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.Property<bool>("HasRgb")
+                    b.Property<string>("Currency")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("HasEcc")
                         .HasColumnType("boolean");
 
                     b.Property<int?>("HeightMm")
@@ -910,7 +912,7 @@ namespace PcBuilder.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<decimal?>("PriceUsd")
+                    b.Property<decimal?>("Price")
                         .HasColumnType("numeric");
 
                     b.Property<int>("SpeedMhz")
@@ -923,10 +925,7 @@ namespace PcBuilder.Migrations
 
                     b.HasIndex("BrandId");
 
-                    b.ToTable("Ram", null, t =>
-                        {
-                            t.ExcludeFromMigrations();
-                        });
+                    b.ToTable("Ram");
                 });
 
             modelBuilder.Entity("PcBuilder.Entities.RegularUserEntity", b =>

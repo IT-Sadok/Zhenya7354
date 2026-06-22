@@ -9,8 +9,7 @@ public class PcMonitorConfiguration : IEntityTypeConfiguration<PcMonitorEntity>
 {
     public void Configure(EntityTypeBuilder<PcMonitorEntity> builder)
     {
-        builder.ToTable("PcMonitor")
-            .Metadata.SetIsTableExcludedFromMigrations(true);
+        
 
         builder.HasOne(e => e.Brand)
             .WithMany()
@@ -20,5 +19,10 @@ public class PcMonitorConfiguration : IEntityTypeConfiguration<PcMonitorEntity>
             .HasConversion(
             v => v.ToString(),
             v => Enum.Parse<PanelType>(v));
+        builder
+            .Property(e => e.Currency)
+            .HasConversion<string>();
+        builder
+            .PrimitiveCollection(m => m.SyncTechnologies);
     }
 }
