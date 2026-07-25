@@ -2,10 +2,11 @@ using PcBuilder.Models;
 using PcBuilder.Entities;
 using PcBuilder.Repositories.Interfaces;
 using PcBuilder.Services.Interfaces;
+using PcBuilder.Enums;
 
 namespace PcBuilder.Services;
 
-public class GpuService(IGpuRepository gpuRepository) : IGpuService
+public class GpuService(IGpuRepository gpuRepository, IComponentCatalogCacheInvalidator invalidator) : IGpuService
 {
     private readonly IGpuRepository _gpuRepository = gpuRepository;
 
@@ -53,7 +54,7 @@ public class GpuService(IGpuRepository gpuRepository) : IGpuService
         };
         await _gpuRepository.AddGpuAsync(gpu, cancellationToken);
         await _gpuRepository.SaveChangesAsync(cancellationToken);
-
+        invalidator.InvalidateCache(BuildComponentType.Gpu);
         return gpu;
     }
     public async Task<GpuEntity> UpdateGpuAsync(int id, GpuUpdateRequest dto, CancellationToken cancellationToken)
@@ -87,6 +88,8 @@ public class GpuService(IGpuRepository gpuRepository) : IGpuService
         if (dto.Price.HasValue) gpu.Price = dto.Price.Value;
 
         await _gpuRepository.SaveChangesAsync(cancellationToken);
+        invalidator.InvalidateCache(BuildComponentType.Gpu);
+
         return gpu;
     }
 
@@ -96,6 +99,7 @@ public class GpuService(IGpuRepository gpuRepository) : IGpuService
             throw new KeyNotFoundException("Gpu not found");
         await _gpuRepository.DeleteGpuAsync(gpu, cancellationToken);
         await _gpuRepository.SaveChangesAsync(cancellationToken);
+        invalidator.InvalidateCache(BuildComponentType.Gpu);
     }
     private async Task EnsureBrandExistsAsync(int brandId, CancellationToken cancellationToken)
     {

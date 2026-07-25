@@ -16,6 +16,7 @@ namespace PcBuilder.Extentions;
 
 public static class ServiceExtensions
 {
+    const string ApiKeyHeaderName = "x-goog-api-key";
     public static WebApplicationBuilder AddAppServices(this WebApplicationBuilder builder)
     {
         builder.Services.AddScoped<IJwtService, JwtService>();
@@ -34,9 +35,25 @@ public static class ServiceExtensions
         builder.Services.AddScoped<IAdminService, AdminService>();
         builder.Services.AddScoped<IAuthService, AuthService>(); 
         builder.Services.AddScoped<IUserContextAccessor, UserContextAccessor>();
+        builder.Services.AddScoped<IAiBuildService, AiBuildSevice>();
+        builder.Services.AddSingleton<IMemoryListCache, MemoryListCache>();
+        builder.Services.AddScoped<IComponentCatalogCacheInvalidator, ComponentCatalogCacheInvalidator>();
 
         builder.Services.AddOpenApi();
         builder.Services.AddHttpContextAccessor();
+
+        builder.Services.AddHttpClient<IGeminiAiProvider, GeminiAiProvider>((serviceProvider ,httpClient) =>
+        {
+            var apiKey = serviceProvider.GetRequiredService<IConfiguration>()["Gemini:ApiKey"];
+
+            if (string.IsNullOrWhiteSpace(apiKey))
+            {
+                throw new InvalidOperationException("API key is missing.");
+            }
+
+            httpClient.DefaultRequestHeaders.Remove(ApiKeyHeaderName);
+            httpClient.DefaultRequestHeaders.Add(ApiKeyHeaderName, apiKey);
+        });
 
         builder.Services.AddDbContext<PcDbContext>(options =>
             options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));

@@ -1,4 +1,5 @@
 using PcBuilder.Entities;
+using PcBuilder.Enums;
 using PcBuilder.Models;
 using PcBuilder.Repositories;
 using PcBuilder.Repositories.Interfaces;
@@ -6,7 +7,7 @@ using PcBuilder.Services.Interfaces;
 
 namespace PcBuilder.Services;
 
-public class MotherboardService(IMotherboardRepository motherboardRepository) : IMotherboardService
+public class MotherboardService(IMotherboardRepository motherboardRepository, IComponentCatalogCacheInvalidator invalidator) : IMotherboardService
 {
     private readonly IMotherboardRepository _motherboardRepository = motherboardRepository;
 
@@ -63,6 +64,7 @@ public class MotherboardService(IMotherboardRepository motherboardRepository) : 
 
         await _motherboardRepository.AddMotherboardAsync(motherboard, cancellationToken);
         await _motherboardRepository.SaveChangesAsync(cancellationToken);
+        invalidator.InvalidateCache(BuildComponentType.Motherboard);
         return motherboard;
     }
 
@@ -104,6 +106,8 @@ public class MotherboardService(IMotherboardRepository motherboardRepository) : 
         if (dto.Price.HasValue) motherboard.Price = dto.Price.Value;
 
         await _motherboardRepository.SaveChangesAsync(cancellationToken);
+        invalidator.InvalidateCache(BuildComponentType.Motherboard);
+
         return motherboard;
     }
 
@@ -114,6 +118,7 @@ public class MotherboardService(IMotherboardRepository motherboardRepository) : 
 
         await _motherboardRepository.DeleteMotherboardAsync(motherboard, cancellationToken);
         await _motherboardRepository.SaveChangesAsync(cancellationToken);
+        invalidator.InvalidateCache(BuildComponentType.Motherboard);
     }
 
     private async Task EnsureBrandExistsAsync(int brandId, CancellationToken cancellationToken)

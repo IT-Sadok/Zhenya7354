@@ -2,10 +2,11 @@ using PcBuilder.Models;
 using PcBuilder.Entities;
 using PcBuilder.Repositories.Interfaces;
 using PcBuilder.Services.Interfaces;
+using PcBuilder.Enums;
 
 namespace PcBuilder.Services;
 
-public class CpuCoolerService(ICpuCoolerRepository cpuCoolerRepository) : ICpuCoolerService
+public class CpuCoolerService(ICpuCoolerRepository cpuCoolerRepository, IComponentCatalogCacheInvalidator invalidator) : ICpuCoolerService
 {
     private readonly ICpuCoolerRepository _cpuCoolerRepository = cpuCoolerRepository;
 
@@ -47,6 +48,7 @@ public class CpuCoolerService(ICpuCoolerRepository cpuCoolerRepository) : ICpuCo
 
         await _cpuCoolerRepository.AddCpuCoolerAsync(cpuCooler, cancellationToken);
         await _cpuCoolerRepository.SaveChangesAsync(cancellationToken);
+        invalidator.InvalidateCache(BuildComponentType.CpuCooler);
         return cpuCooler;
     }
 
@@ -73,6 +75,7 @@ public class CpuCoolerService(ICpuCoolerRepository cpuCoolerRepository) : ICpuCo
         if (dto.Price.HasValue) cpuCooler.Price = dto.Price.Value;
 
         await _cpuCoolerRepository.SaveChangesAsync(cancellationToken);
+        invalidator.InvalidateCache(BuildComponentType.CpuCooler);
         return cpuCooler;
     }
 
@@ -83,6 +86,7 @@ public class CpuCoolerService(ICpuCoolerRepository cpuCoolerRepository) : ICpuCo
 
         await _cpuCoolerRepository.DeleteCpuCoolerAsync(cpuCooler, cancellationToken);
         await _cpuCoolerRepository.SaveChangesAsync(cancellationToken);
+        invalidator.InvalidateCache(BuildComponentType.CpuCooler);
     }
 
     private async Task EnsureBrandExistsAsync(int brandId, CancellationToken cancellationToken)

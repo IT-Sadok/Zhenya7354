@@ -1,11 +1,12 @@
 using PcBuilder.Entities;
+using PcBuilder.Enums;
 using PcBuilder.Models;
 using PcBuilder.Repositories.Interfaces;
 using PcBuilder.Services.Interfaces;
 
 namespace PcBuilder.Services;
 
-public class CpuService(ICpuRepository cpuRepository) : ICpuService
+public class CpuService(ICpuRepository cpuRepository, IComponentCatalogCacheInvalidator invalidator) : ICpuService
 {
     private readonly ICpuRepository _cpuRepository = cpuRepository;
     public async Task<List<CpuEntity>> GetAllCpuAsync(CancellationToken cancellationToken)
@@ -54,6 +55,7 @@ public class CpuService(ICpuRepository cpuRepository) : ICpuService
 
         await _cpuRepository.AddCpuAsync(cpu, cancellationToken);
         await _cpuRepository.SaveChangesAsync(cancellationToken);
+        invalidator.InvalidateCache(BuildComponentType.Cpu);
         return cpu;
     }
     public async Task<CpuEntity> UpdateCpuAsync(int id, CpuUpdateRequest dto, CancellationToken cancellationToken)
@@ -90,6 +92,7 @@ public class CpuService(ICpuRepository cpuRepository) : ICpuService
         if (dto.Price.HasValue) cpu.Price = dto.Price.Value;
 
         await _cpuRepository.SaveChangesAsync(cancellationToken);
+        invalidator.InvalidateCache(BuildComponentType.Cpu);
         return cpu;
     }
     public async Task DeleteCpuAsync(int id, CancellationToken cancellationToken)
@@ -98,6 +101,7 @@ public class CpuService(ICpuRepository cpuRepository) : ICpuService
             throw new KeyNotFoundException("Cpu not found");
         await _cpuRepository.DeleteCpuAsync(cpu, cancellationToken);
         await _cpuRepository.SaveChangesAsync(cancellationToken);
+        invalidator.InvalidateCache(BuildComponentType.Cpu);
     }
     private async Task EnsureBrandExistsAsync(int brandId, CancellationToken cancellationToken)
     {

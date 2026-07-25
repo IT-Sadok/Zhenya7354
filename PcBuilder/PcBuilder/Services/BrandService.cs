@@ -5,7 +5,7 @@ using PcBuilder.Services.Interfaces;
 
 namespace PcBuilder.Services;
 
-public class BrandService(IBrandRepository brandRepository) : IBrandService
+public class BrandService(IBrandRepository brandRepository, IComponentCatalogCacheInvalidator invalidator) : IBrandService
 {
     private readonly IBrandRepository _brandRepository = brandRepository;
 
@@ -42,6 +42,7 @@ public class BrandService(IBrandRepository brandRepository) : IBrandService
         if (!string.IsNullOrWhiteSpace(dto.Name)) brand.Name = dto.Name;
 
         await _brandRepository.SaveChangesAsync(cancellationToken);
+        invalidator.InvalidateComponentCatalog();
         return brand;
     }
 
@@ -52,5 +53,6 @@ public class BrandService(IBrandRepository brandRepository) : IBrandService
 
         await _brandRepository.DeleteBrandAsync(brand, cancellationToken);
         await _brandRepository.SaveChangesAsync(cancellationToken);
+        invalidator.InvalidateComponentCatalog();
     }
 }
