@@ -22,11 +22,7 @@ builder.AddIdentityAndJwt();
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var seeder = scope.ServiceProvider.GetRequiredService<IDbSeeder>();
-    await seeder.SeedDataAsync(scope.ServiceProvider);
-}
+app.AddDataSeeding();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -55,4 +51,4 @@ app.MapAiBuildEndpoints();
 
 app.Run();
 
-
+public partial class Program { }
